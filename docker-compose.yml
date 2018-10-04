@@ -1,0 +1,10 @@
+version: '3.1'
+services: 
+  web-app:
+    build: ./services/web-app
+    command: npm run dev
+    ports: 
+      - 3000:3000
+    volumes: 
+      - ./services/web-app:/usr/src/app
+      - /usr/src/app/node_modules
