@@ -1,0 +1,44 @@
+version: '3.1'
+services: 
+
+  auth-db:
+    image: mongo:3.2-jessie
+    container_name: mongo-container 
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASS}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_PORT: ${MONGO_PORT}
+      APP_DB: ${APP_DB}
+      APP_DB_USER: ${APP_DB_USER}
+      APP_DB_PASS: ${APP_DB_PASS}  
+    networks: 
+      - backend
+    volumes:
+      - auth-db-data:/data/db
+      - ./services/auth/src/db/init-scripts/:/docker-entrypoint-initdb.d/
+
+  auth-service:
+    build: ./services/auth
+    image: auth
+    command: npm run dev
+    networks: 
+      - backend
+    volumes:
+      - ./services/auth:/usr/src/app
+      - auth-node-modules:/usr/src/app/node_modules
+    env_file:
+      - auth.env
+    depends_on:
+      - auth-db
+    ports:
+      - '3030:3030'
+  
+
+volumes:
+  auth-node-modules:
+  auth-db-data:
+
+networks: 
+  backend: 
