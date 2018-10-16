@@ -3,4 +3,9 @@ const auth = require('./auth');
 module.exports = {
   typeDefs: auth.typeDefs,
   resolvers: auth.resolvers,
+  context: {
+    models: {
+      auth: auth.model,
+    },
+  },
 };

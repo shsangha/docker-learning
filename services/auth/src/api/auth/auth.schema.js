@@ -3,19 +3,30 @@ const { gql } = require('apollo-server-express');
 module.exports = gql`
 
 input LoginInput {
-  username: String!
-  password: String!
-}
-
-input SignUpInput {
-  username: String!
   email: String!
   password: String!
 }
 
+input SignUpInput {
+  email: String!
+  password: String!
+}
+
+type successAuthResponse {
+  token: String!
+  refreshToken: String!
+}
+
+type error {
+  email: [String]
+  password: [String]
+}
+
+union AuthResponse = error | successAuthResponse
+
 type Mutation {
-  login(input: LoginInput!): String! 
-  signUp(input:SignUpInput!): String!
+  login(input: LoginInput!): AuthResponse! 
+  signUp(input:SignUpInput!): AuthResponse
 }
 
 type Query {
