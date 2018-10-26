@@ -1,5 +1,3 @@
 const mongoose = require('mongoose');
 
-module.exports = (mongoUrl = 'mongodb://localhost/grailed') => {
-  return mongoose.connect(mongoUrl);
-};
+module.exports = (mongoUrl = 'mongodb://auth-db/auth', options) => mongoose.connect(mongoUrl, options);

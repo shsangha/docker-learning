@@ -1,9 +1,0 @@
-type Mutation {
-  login(input: LoginInput!): String! 
-  signUp(input:SignUpInput!): String!
-}
-
-type Query {
-  authedUser: String!
-}
-
