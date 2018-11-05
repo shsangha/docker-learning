@@ -29,5 +29,6 @@ COPY ./pipeline.js .
 COPY ./wait-for.sh .
 COPY ./wait-for-then.sh .
 COPY ./wait-for-repl.sh .
+COPY ./check-for-collection.sh .
 
 ENTRYPOINT ./wait-for-then.sh
