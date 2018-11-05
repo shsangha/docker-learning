@@ -1,9 +1,8 @@
 version: '3.1'
-services: 
-
+services:
   auth-db:
     image: mongo:3.2-jessie
-    container_name: mongo-container 
+    container_name: mongo-container
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
@@ -12,42 +11,105 @@ services:
       MONGO_PORT: ${MONGO_PORT}
       APP_DB: ${APP_DB}
       APP_DB_USER: ${APP_DB_USER}
-      APP_DB_PASS: ${APP_DB_PASS}  
-    networks: 
+      APP_DB_PASS: ${APP_DB_PASS}
+    networks:
       - backend
     volumes:
       - auth-db-data:/data/db
       - ./services/auth/src/db/init-scripts/:/docker-entrypoint-initdb.d/
-
+  
   auth-service:
     build: ./services/auth
     image: auth
     command: npm run start
-    networks: 
+    networks:
       - backend
     volumes:
       - auth-node-modules:/usr/src/app/node_modules
+    env_file:
+      - auth.env
     depends_on:
       - auth-db
+    ports:
+      - '3030:3030'
   
+  gateway:
+    build: ./services/gateway
+    image: gateway
+    command: npm run dev
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - gateway-node-modules:/usr/src/app/node_modules
+      - ./services/gateway:/usr/src/app
+    env_file:
+      - gateway.env
+    ports:
+      - '4000:4000'
+    depends_on:
+      - auth-service
+  
+  mongo-es-transport:
+    build: ./services/mongo-es-transport
+    container_name: mongo-es-transport
+    networks:
+      - backend
+    depends_on:
+      - listingDB
+      - kibana
+
+  listingDB:
+    image: mongo:4.0-xenial
+    restart: always
+    command: mongod --replSet "rs0"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: listings
+      MONGO_ADVERTISED_HOSTNAME: mongo
+    networks:
+      - backend
+    volumes:
+      - listingData:/data/db
+      - ./services/listings/mongo/scripts:/docker-entrypoint-initdb.d/
+
+  elasticsearch:
+    image: elasticsearch:5.6
+    networks:
+      - backend
+    volumes:
+      - esData:/usr/share/elasticsearch/data
+
+  kibana:
+    image: kibana:5.6
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    networks:
+      - backend
+
   web-app:
     build: ./services/web-app
     image: web-app
     command: npm run dev
-    ports: 
+    ports:
       - '3000:3000'
-    volumes: 
+    volumes:
       - ./services/web-app:/usr/src/app
       - web-app-node-modules:/usr/src/app/node_modules
-    networks: 
+    networks:
       - frontend
 
-volumes:
+volumes: 
   auth-node-modules:
+  gateway-node-modules:
   web-app-node-modules:
   auth-db-data:
+  esData:
+  listingData:
 
-networks: 
-  frontend:
-  backend: 
-
+networks:
+   frontend:
+   backend:
