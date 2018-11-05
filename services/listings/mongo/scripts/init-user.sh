@@ -7,6 +7,6 @@ mongo admin \
         -p root\
         --authenticationDatabase admin \
         --eval "db.createUser({user: 'shawn', pwd: 'shawn', roles:[
-                {role: 'dbOwner', db: 'grailed'},
+                {role: 'dbOwner', db: 'listings'},
                 {role: 'dbAdmin', db: 'local'}
         ]});"
