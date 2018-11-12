@@ -1,0 +1,40 @@
+version: '3.1'
+services: 
+  auth-db-test:
+    image: mongo:4.0-xenial
+    container_name: mtst
+    restart: always 
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: auth
+      MONGO_PORT: 27017
+    ports:
+        - '27017:27017'
+    networks: 
+      - test-backend
+    volumes:
+      - auth-db-test-data:/data/db
+
+  auth-service-test:
+    build: .
+    image: auth-test
+    command: npm run dev
+    networks: 
+      - test-backend
+    volumes:
+      - auth-test-node-modules:/usr/src/app/node_modules
+      - .:/usr/src/app
+    ports:
+      - '3030:3030'
+    depends_on:
+      - auth-db-test
+    environment:
+      SECRET: -q%1@Y|E'4wGVnrIb7k|]=}[vm[vNd
+      REF_SECRET: C4o;NYg$xM`syoZB%C0J?mz|%9DS`0
+
+volumes:
+  auth-test-node-modules:
+  auth-db-test-data:
+networks: 
+  test-backend:
