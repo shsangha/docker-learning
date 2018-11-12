@@ -1,38 +1,44 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const User = require('./auth.model');
 
 const { SECRET, REF_SECRET } = process.env;
 
-const createTokens = async (user) => {
-  const { id, username, password } = user;
+const createTokens = user => {
+  const { _id, email, password } = user;
   const refreshSecret = password + REF_SECRET;
   const createToken = jwt.sign(
     {
-      user: { id, username },
+      user: { id: _id, email }
     },
     SECRET,
     {
-      expiresIn: '1hr',
-    },
+      expiresIn: '1000'
+    }
   );
 
   const createRefreshToken = jwt.sign(
     {
-      user: { id },
+      user: { id: _id }
     },
     refreshSecret,
     {
-      expiresIn: '14d',
-    },
+      expiresIn: '14d'
+    }
   );
 
-  return [createToken, createRefreshToken];
+  return {
+    token: createToken,
+    refreshToken: createRefreshToken
+  };
 };
 
-const refreshTokens = async (token, refreshToken, models) => {
+const refreshTokens = async refreshToken => {
   let userId;
+  //  console.log(jwt.decode(refreshToken));
   try {
-    const { user: { id } } = jwt.decode(refreshToken);
+    const {
+      user: { id }
+    } = jwt.decode(refreshToken);
     userId = id;
   } catch (e) {
     return {};
@@ -41,7 +47,7 @@ const refreshTokens = async (token, refreshToken, models) => {
     return {};
   }
 
-  const user = await models.User.findById(userId);
+  const user = await User.findById(userId);
 
   if (!user) {
     return {};
@@ -52,37 +58,20 @@ const refreshTokens = async (token, refreshToken, models) => {
   } catch (err) {
     return {};
   }
-  const [newToken, newRefreshToken] = await createTokens(user, refreshSecret);
-  return {
-    token: newToken,
-    refreshToken: newRefreshToken,
-  };
-};
 
-const attemptLogin = async (email, password, models) => {
-  const user = await models.User.findOne({ email });
-  if (!user) {
+  try {
+    const { token, refreshToken } = createTokens(user);
     return {
-      error: 'no user found',
+      token,
+      refreshToken,
+      user
     };
+  } catch (error) {
+    return {};
   }
-  const validPw = await bcrypt.compare(password, user.password);
-  if (!validPw) {
-    return {
-      error: 'invalid password',
-    };
-  }
-
-  const [token, refreshToken] = await createTokens(user);
-
-  return {
-    token,
-    refreshToken,
-  };
 };
 
 module.exports = {
   createTokens,
-  refreshTokens,
-  attemptLogin,
+  refreshTokens
 };
