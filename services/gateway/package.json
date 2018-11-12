@@ -4,19 +4,27 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon --legacy-watch index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "apollo-link": "^1.2.3",
+    "apollo-link-context": "^1.0.9",
     "apollo-link-http": "^1.5.5",
     "apollo-server": "^2.1.0",
     "apollo-server-express": "^2.1.0",
+    "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "graphql": "^14.0.2",
     "graphql-tools": "^4.0.0",
     "jsonwebtoken": "^8.3.0",
     "node-fetch": "^2.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4"
   }
 }
