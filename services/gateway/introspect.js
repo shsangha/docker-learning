@@ -11,22 +11,16 @@ module.exports = {
     });
 
     const link = setContext((req, pCtx) => {
-      if (
-        pCtx.graphqlContext &&
-        pCtx.graphqlContext.hasOwnProperty('token') &&
-        pCtx.graphqlContext.hasOwnProperty('refToken')
-      ) {
+      if (pCtx.graphqlContext && pCtx.graphqlContext.hasOwnProperty('user')) {
         return {
           headers: {
-            'x-token': pCtx.graphqlContext.token,
-            'x-refresh-token': pCtx.graphqlContext.refToken
+            'x-user': pCtx.graphqlContext.user
           }
         };
       }
       return {
         headers: {
-          'x-token': null,
-          'x-refresh-token': null
+          'x-user': {}
         }
       };
     }).concat(http);
@@ -38,10 +32,3 @@ module.exports = {
     });
   }
 };
-/*
-const createLink = () =>
-      createHttpLink({
-        uri,
-        fetch
-      });
-*/
