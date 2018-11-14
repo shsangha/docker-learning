@@ -10,32 +10,34 @@ const UserSchema = new Schema({
     unique: true,
     validate: {
       validator: function(v) {
-        return  /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v);
+        return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+          v
+        );
       },
-      message: 'Enter a valid email',
-    },
+      message: 'Enter a valid email'
+    }
   },
   password: {
     type: String,
     required: [true, 'Password is required'],
     validate: {
       validator: function(v) {
-        return  /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]{8})$/.test(v);
+        return /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/.test(v);
       },
-      message: 'Password requires 1 number, 1 uppercase character and 8 characters',
-    },
-  },
+      message: 'invalid password'
+    }
+  }
 });
 
-UserSchema.pre('save', function (next) {
+UserSchema.pre('save', function(next) {
   let user = this;
-   if (!user.isModified('password')) return next;
+  if (!user.isModified('password')) return next;
 
-   bcrypt.hash(user.password,10, function(err, hash) {
-      if (err) return next(err);
-      user.password = hash;
-      next();
-   });
+  bcrypt.hash(user.password, 10, function(err, hash) {
+    if (err) return next(err);
+    user.password = hash;
+    next();
+  });
 });
 
 module.exports = mongoose.model('User', UserSchema);
