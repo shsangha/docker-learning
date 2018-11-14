@@ -14,6 +14,8 @@ const server = createServer({
   }
 });
 
+const { mutate } = createTestClient(server);
+
 const signInMutation = gql`
   mutation signin($input: AuthInput!) {
     signUp(input: $input) {
@@ -28,23 +30,28 @@ const signInMutation = gql`
     }
   }
 `;
+
+const validEmail = 'shawn@signuptest.com';
+const validPassword = '%ff3aDD98fd';
+
 describe('testing sigin functionality', () => {
   beforeAll(async () => {
     await mongoose.connect(global.__MONGO_URI__);
   });
 
   afterAll(async () => {
+    await User.remove({ email: validEmail });
     await mongoose.connection.close();
   });
 
   beforeEach(async () => {
-    await User.remove({});
+    await User.remove({ email: validEmail });
   });
 
   test('it returns tokens if a valid user signs up', async () => {
     const input = {
       input: {
-        email: 'shawn@kjdaf.ca',
+        email: validEmail,
         password: '3G55sf%ssf'
       }
     };
@@ -61,7 +68,6 @@ describe('testing sigin functionality', () => {
         password: ''
       }
     };
-    const { mutate } = createTestClient(server);
     const { data, errors } = await mutate({ mutation: signInMutation, variables: input });
     expect(data.signUp.emailErrors).toContain('Email is required');
     expect(data.signUp.passwordErrors).toContain('Password is required');
@@ -70,7 +76,6 @@ describe('testing sigin functionality', () => {
     const input = {
       input: {}
     };
-    const { mutate } = createTestClient(server);
     const { data, errors } = await mutate({ mutation: signInMutation, variables: input });
     expect(errors).toHaveLength(2);
     expect(data).toBe(undefined);
@@ -82,7 +87,6 @@ describe('testing sigin functionality', () => {
         password: '8H6$hdsfd2'
       }
     };
-    const { mutate } = createTestClient(server);
     const { data, errors } = await mutate({ mutation: signInMutation, variables: input });
     expect(data.signUp.emailErrors).toContain('Enter a valid email');
   });
@@ -93,25 +97,23 @@ describe('testing sigin functionality', () => {
         password: '8H62'
       }
     };
-    const { mutate } = createTestClient(server);
     const { data, errors } = await mutate({ mutation: signInMutation, variables: input });
     expect(data.signUp.passwordErrors).toContain('invalid password');
   });
   test('detects when email is in use', async () => {
     const existingUser = {
-      email: 'shawn@gmail.com',
-      password: '34%ssad93'
+      email: validEmail,
+      password: validPassword
     };
 
     await User.create(existingUser);
 
     const input = {
       input: {
-        email: 'shawn@gmail.com',
-        password: '8H676%$$2'
+        email: validEmail,
+        password: validPassword
       }
     };
-    const { mutate } = createTestClient(server);
     const { data, errors } = await mutate({ mutation: signInMutation, variables: input });
     expect(data.signUp.emailErrors).toContain('Email already in use');
   });
