@@ -9,5 +9,5 @@ var sink = elasticsearch({
   uri: 'http://elasticsearch:9200/listings',
   timeout: '30s'
 });
-
-t.Source('source', source, '/.*/').Save('sink', sink, '/.*/');
+// prettier-ignore
+t.Source('source', source, '/.*/').Transform(goja({"filename":"priceFilterTransform.js"})).Transform(omit({"fields": ["likes", "description", "photos", "accept_offers", "comments", "sold", "buy_now", "shipping"]})).Save('sink', sink, '/.*/');
