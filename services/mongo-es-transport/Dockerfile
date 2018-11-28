@@ -16,6 +16,8 @@ RUN  apt-get update \
   netcat \
   && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && sudo apt-get install --only-upgrade bash
+
 #download from github 
 RUN wget https://github.com/compose/transporter/releases/download/v0.5.2/transporter-0.5.2-linux-amd64
 
