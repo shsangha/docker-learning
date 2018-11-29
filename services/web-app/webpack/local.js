@@ -49,12 +49,9 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin()
   ],
   devServer: {
-    host: '0.0.0.0',
+    host: 'localhost',
     port: 3000,
     hot: true
   },
-  watch: true,
-  watchOptions: {
-    poll: 1000
-  }
+  watch: true
 };
