@@ -1,106 +1,106 @@
 version: '3.1'
 services:
- #auth-db:
- #  image: mongo:3.2-jessie
- #  container_name: mongo-container
+ #uth-db:
+ # image: mongo:3.2-jessie
+ # container_name: mongo-container
+ # restart: always
+ # environment:
+ #   MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+ #   MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASS}
+ #   MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+ #   MONGO_PORT: ${MONGO_PORT}
+ #   APP_DB: ${APP_DB}
+ #   APP_DB_USER: ${APP_DB_USER}
+ #   APP_DB_PASS: ${APP_DB_PASS}
+ # networks:
+ #   - backend
+ # volumes:
+ #   - auth-db-data:/data/db
+ #   - ./services/auth/src/db/init-scripts/:/docker-entrypoint-initdb.d/
+ #
+ #uth-service:
+ # build: ./services/auth
+ # image: auth
+ # command: npm run start
+ # networks:
+ #   - backend
+ # volumes:
+ #   - auth-node-modules:/usr/src/app/node_modules
+ # env_file:
+ #   - auth.env
+ # depends_on:
+ #   - auth-db
+ # ports:
+ #   - '3030:3030'
+ #
+ #ateway:
+ # build: ./services/gateway
+ # image: gateway
+ # command: npm run dev
+ # networks:
+ #   - frontend
+ #   - backend
+ # volumes:
+ #   - gateway-node-modules:/usr/src/app/node_modules
+ #   - ./services/gateway:/usr/src/app
+ # env_file:
+ #   - gateway.env
+ # ports:
+ #   - '4000:4000'
+ # depends_on:
+ #   - auth-service
+ #
+ #mongo-es-transport:
+ #  build: ./services/mongo-es-transport
+ #  container_name: mongo-es-transport
+ #  networks:
+ #    - backend
+ #  depends_on:
+ #    - listing-db
+ #    - kibana
+
+ #listing-db:
+ #  image: mongo:4.0-xenial
  #  restart: always
+ #  command: mongod --replSet "rs0"
  #  environment:
- #    MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
- #    MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASS}
- #    MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
- #    MONGO_PORT: ${MONGO_PORT}
- #    APP_DB: ${APP_DB}
- #    APP_DB_USER: ${APP_DB_USER}
- #    APP_DB_PASS: ${APP_DB_PASS}
+ #    MONGO_INITDB_ROOT_USERNAME: root
+ #    MONGO_INITDB_ROOT_PASSWORD: root
+ #    MONGO_INITDB_DATABASE: listings
+ #    MONGO_ADVERTISED_HOSTNAME: mongo
  #  networks:
  #    - backend
  #  volumes:
- #    - auth-db-data:/data/db
- #    - ./services/auth/src/db/init-scripts/:/docker-entrypoint-initdb.d/
- #
- #auth-service:
- #  build: ./services/auth
- #  image: auth
- #  command: npm run start
+ #    - listingData:/data/db
+ #    - ./services/listings/mongo/scripts:/docker-entrypoint-initdb.d/
+
+ #elasticsearch:
+ #  image: elasticsearch:5.6
  #  networks:
  #    - backend
  #  volumes:
- #    - auth-node-modules:/usr/src/app/node_modules
- #  env_file:
- #    - auth.env
- #  depends_on:
- #    - auth-db
+ #    - esData:/usr/share/elasticsearch/data
+
+ #kibana:
+ #  image: kibana:5.6
  #  ports:
- #    - '3030:3030'
- #
- #gateway:
- #  build: ./services/gateway
- #  image: gateway
- #  command: npm run dev
- #  networks:
- #    - frontend
- #    - backend
- #  volumes:
- #    - gateway-node-modules:/usr/src/app/node_modules
- #    - ./services/gateway:/usr/src/app
- #  env_file:
- #    - gateway.env
- #  ports:
- #    - '4000:4000'
+ #    - 5601:5601
  #  depends_on:
- #    - auth-service
-  
-  mongo-es-transport:
-    build: ./services/mongo-es-transport
-    container_name: mongo-es-transport
-    networks:
-      - backend
-    depends_on:
-      - listing-db
-      - kibana
+ #    - elasticsearch
+ #  networks:
+ #    - backend
 
-  listing-db:
-    image: mongo:4.0-xenial
-    restart: always
-    command: mongod --replSet "rs0"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
-      MONGO_INITDB_DATABASE: listings
-      MONGO_ADVERTISED_HOSTNAME: mongo
-    networks:
-      - backend
-    volumes:
-      - listingData:/data/db
-      - ./services/listings/mongo/scripts:/docker-entrypoint-initdb.d/
-
-  elasticsearch:
-    image: elasticsearch:5.6
-    networks:
-      - backend
-    volumes:
-      - esData:/usr/share/elasticsearch/data
-
-  kibana:
-    image: kibana:5.6
+  web-app:
+    build: ./services/web-app
+    image: web-app
+    command: npm run dev
     ports:
-      - 5601:5601
-    depends_on:
-      - elasticsearch
+      - '3000:3000'
+    volumes:
+      - ./services/web-app:/usr/src/app
+      - web-app-node-modules:/usr/src/app/node_modules
     networks:
-      - backend
-
- # web-app:
- #   build: ./services/web-app
- #   image: web-app
- #   command: npm run dev
- #   ports:
- #     - '3000:3000'
- #   volumes:
- #     - ./services/web-app:/usr/src/app
- #     - web-app-node-modules:/usr/src/app/node_modules
- #   networks:
- #     - frontend
+      - frontend
 
 volumes: 
   auth-node-modules:
