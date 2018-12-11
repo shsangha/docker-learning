@@ -1,0 +1,20 @@
+@import '../../core-styles/colors.scss';
+
+.globalHeader {
+  min-height: 7.6rem;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: center;
+  position: relative;
+  height: 7.6rem;
+  padding: 1.7rem 2rem;
+  border-bottom: 1px solid #000;
+  z-index: 0;
+}
