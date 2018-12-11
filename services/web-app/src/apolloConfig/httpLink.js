@@ -2,6 +2,7 @@ import { HttpLink } from 'apollo-link-http';
 import { onError } from 'apollo-link-error';
 import { setContext } from 'apollo-link-context';
 import { ApolloLink, from } from 'apollo-link';
+import stateLink from './stateLink';
 
 const httpLink = new HttpLink({
   uri: 'http://localhost:4000/graphql'
@@ -49,6 +50,6 @@ const afterwareLink = new ApolloLink((operation, forward) => {
   });
 });
 
-const link = from([afterwareLink, middlewareLink, logErrLink, httpLink]);
+const link = from([afterwareLink, middlewareLink, logErrLink, stateLink, httpLink]);
 
 export default link;
