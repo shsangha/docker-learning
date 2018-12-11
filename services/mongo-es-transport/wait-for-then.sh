@@ -8,7 +8,7 @@ export EPORT=9200
 export EHOST=elasticsearch
 
 export MPORT=27017
-export MHOST=listingDB
+export MHOST=listing-db
 
 echo "Waiting for ${MHOST}:${MPORT} ..." && \
     ./wait-for.sh "$MHOST:$MPORT" -t 60 -- \

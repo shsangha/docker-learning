@@ -28,7 +28,7 @@ RUN mv transporter-*-linux-amd64 /usr/local/bin/transporter
 RUN chmod +x /usr/local/bin/transporter
 
 COPY ./pipeline.js .
-COPY priceFilterTransform.js .
+COPY ./priceFilterTransform.js .
 COPY ./wait-for.sh .
 COPY ./wait-for-then.sh .
 COPY ./wait-for-repl.sh .
