@@ -13,6 +13,7 @@ const login = async (_, { input: { email, password } }, { models }, info) => {
     }
     return { ...createTokens(user) };
   } catch (e) {
+    console.log(e);
     return { emailErrors: ['Issue connecting to authentication service try again'] };
   }
 };
