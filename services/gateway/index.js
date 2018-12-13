@@ -15,14 +15,12 @@ const remoteEndpoints = ['http://auth-service:3030/graphql'];
     const server = new ApolloServer({
       schema: mergeSchemas({ schemas }),
       context: ({ req }) => {
-        return {
-          user: req.user
-        };
+        return req.user ? { user: req.user } : {};
       }
     });
     app.use(
       cors({
-        exposedHeaders: ['x-token', 'x-refresh-token']
+        exposedHeaders: ['x-user']
       })
     );
     app.use(authMiddleware);

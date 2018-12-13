@@ -14,15 +14,10 @@ module.exports = {
       if (pCtx.graphqlContext && pCtx.graphqlContext.hasOwnProperty('user')) {
         return {
           headers: {
-            'x-user': pCtx.graphqlContext.user
+            'x-user': pCtx.graphqlContext.user._id
           }
         };
       }
-      return {
-        headers: {
-          'x-user': {}
-        }
-      };
     }).concat(http);
     const schema = await introspectSchema(link);
 
