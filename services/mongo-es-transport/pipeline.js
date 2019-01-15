@@ -10,4 +10,8 @@ var sink = elasticsearch({
   timeout: '60s'
 });
 // prettier-ignore
-t.Source('source', source, '/.*/').Transform(goja({"filename":"priceFilterTransform.js"})).Transform(omit({"fields": ["description", "photos", "accept_offers", "comments", "buy_now", "shipping"]})).Save('sink', sink, '/.*/');
+t.Source('source', source, '/.*/')
+.Transform(omit({"fields": ["description", "photos", "accept_offers", "comments", "buy_now", "shipping"]}))
+.Transform(goja({"filename":"priceFilterTransform.js"}))
+.Transform(goja({"filename": "indexSuggestions.js"}))
+.Save('sink', sink, '/.*/');
