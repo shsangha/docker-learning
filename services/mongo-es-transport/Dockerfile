@@ -29,9 +29,11 @@ RUN chmod +x /usr/local/bin/transporter
 
 COPY ./pipeline.js .
 COPY ./priceFilterTransform.js .
+COPY ./indexSuggestions.js .
 COPY ./wait-for.sh .
 COPY ./wait-for-then.sh .
 COPY ./wait-for-repl.sh .
+COPY ./configure-mapping.sh .
 COPY ./check-for-collection.sh .
 
 ENTRYPOINT ./wait-for-then.sh
