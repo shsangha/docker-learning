@@ -18,4 +18,6 @@ echo "Waiting for ${MHOST}:${MPORT} ..." && \
     ./check-for-collection.sh
     echo "Waiting for ${EHOST}:${EPORT} ..." && \
     ./wait-for.sh "$EHOST:$EPORT" -t 60 -- \
+    echo "Configuring ES mappings" && \
+    ./configure-mapping.sh  
     transporter run -log.level "debug" pipeline.js
