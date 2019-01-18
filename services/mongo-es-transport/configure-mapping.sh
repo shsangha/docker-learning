@@ -52,7 +52,7 @@ if [[ "$IP" -eq 404 ]]; then
           "posted": {"type": "date"},
           "views": {"type": "integer"},
           "wanted": {"type": "integer"},
-          "status": {"type": "keyword"}
+          "status": {"type": "keyword"} 
         }
       }
     }
