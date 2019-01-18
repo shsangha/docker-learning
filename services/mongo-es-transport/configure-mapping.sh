@@ -10,30 +10,40 @@ if [[ "$IP" -eq 404 ]]; then
   
   curl -X PUT "http://elasticsearch:9200/listings" -H 'Content-Type: application/json' -d'
 {
-    "settings" : {
+    "settings" :  {
         "index" : {
             "number_of_shards" : 3, 
             "number_of_replicas" : 2,
             "analysis": {
-              "analyzer": {
-                "custom_analyzer": {
-                  "type": "custom",
-                  "tokenizer": "lowercase",
-                  "char_filter": [],
-                  "filter": [
-                    "asciifolding",
-                    "trim"
-                  ]
+              "tokenizer": {},
+              "filter": {
+                "autocomplete_filter": {
+                  "type": "edge_ngram",
+                  "min_gram": "1",
+                  "max_gram": "25"
                 }
+            },
+            "char_filter": {},
+            "analyzer": {
+               "autocomplete_analyzer": {
+                "type": "custom",
+                "tokenizer": "lowercase",
+                "char_filter": [],
+                "filter": [
+                  "asciifolding",
+                  "trim",
+                  "autocomplete_filter"
+                ]
               }
             }
+          }
         }    
     },
     "mappings": {
       "listings": {
         "properties": {
-          "name": {"type": "text", "analyzer": "custom_analyzer"},
-          "designer": {"type": "keyword"},
+          "name": {"type": "text", "fields":{"raw": {"type": "keyword"}}, "analyzer": "autocomplete_analyzer", "search_analyzer": "standard"},
+          "designer": {"type": "text", "fields": {"raw": {"type": "keyword"}}, "analyzer": "autocomplete_analyzer", "search_analyzer": "standard", "boost": "1.4" },
           "category": {"type": "keyword"},
           "size": {"type": "keyword"},
           "price": {"type": "scaled_float", "scaling_factor":100},
@@ -42,8 +52,7 @@ if [[ "$IP" -eq 404 ]]; then
           "posted": {"type": "date"},
           "views": {"type": "integer"},
           "wanted": {"type": "integer"},
-          "designer_suggestions": {"type": "completion","contexts": [{"name": "status", "type": "category", "path": "status"}] , "analyzer": "simple"},
-          "name_suggestions": {"type": "completion", "contexts": [{"name": "status", "type": "category", "path": "status"}] ,"analyzer": "stop"}
+          "status": {"type": "keyword"}
         }
       }
     }
