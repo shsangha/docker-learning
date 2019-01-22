@@ -3,7 +3,7 @@
 /* eslint-disable no-undef */
 import React from 'react';
 import { shallow } from 'enzyme';
-import SuggestionSearch from '../../SuggestionSearch';
+import SuggestionSearch from '../../../SuggestionSearch';
 
 describe('checks if the component is capable of splitting the changes into controlled/uncontrolled', () => {
   test('returrns empty objects if there are no changes', () => {

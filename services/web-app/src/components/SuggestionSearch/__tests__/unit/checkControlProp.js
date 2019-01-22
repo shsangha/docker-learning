@@ -3,7 +3,7 @@
 /* eslint-disable react/jsx-filename-extension */
 import React from 'react';
 import { shallow } from 'enzyme';
-import SuggestionSearch from '../../SuggestionSearch';
+import SuggestionSearch from '../../../SuggestionSearch';
 
 describe('tests the ability to check if a piece of state belongs to state or props', () => {
   test('all state are control props', () => {

@@ -4,7 +4,7 @@
 /* eslint-disable no-undef */
 import React from 'react';
 import { shallow } from 'enzyme';
-import SuggestionSearch from '../../SuggestionSearch';
+import SuggestionSearch from '../../../SuggestionSearch';
 
 describe('test if filter function can return an object with only state that is changing', () => {
   test('detects change and return just those', () => {

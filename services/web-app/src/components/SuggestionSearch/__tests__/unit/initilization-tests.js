@@ -5,7 +5,7 @@
 /* eslint-disable react/jsx-filename-extension */
 import React from 'react';
 import { shallow, mount } from 'enzyme';
-import SuggestionSearch from '../../SuggestionSearch';
+import SuggestionSearch from '../../../SuggestionSearch';
 
 test('renders without blowing up', () => {});
 

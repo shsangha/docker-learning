@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import combineEventHandlers from '../../utils/combineEventHandlers';
+import combineEventHandlers from '../../../SuggestionSearch/utils/combineEventHandlers';
 
 const mock1 = jest.fn();
 const mock2 = jest.fn();

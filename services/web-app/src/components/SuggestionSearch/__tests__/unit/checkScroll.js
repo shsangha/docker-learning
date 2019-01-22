@@ -5,7 +5,7 @@
 // since js-dom can't actually do any rendering offSet and height will always return zero even if we use attachOptions in enzyme
 // so the only real test we can do it to stub the values and make sure the math is right
 
-import checkScrollNeeded from '../../utils/checkScrollNeeded';
+import checkScrollNeeded from '../../../SuggestionSearch/utils/checkScrollNeeded';
 
 const menu = {
   scrollTop: 0,

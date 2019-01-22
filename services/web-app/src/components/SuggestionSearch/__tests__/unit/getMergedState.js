@@ -4,7 +4,7 @@
 /* eslint-disable react/jsx-filename-extension */
 import React from 'react';
 import { shallow } from 'enzyme';
-import SuggestionSearch from '../../SuggestionSearch';
+import SuggestionSearch from '../../../SuggestionSearch';
 
 describe('tests to make sure that we can get merged state from props/state', () => {
   test('returns just the internal state when we dont use control props', () => {
