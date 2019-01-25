@@ -1,0 +1,11 @@
+@import '../../../../core-styles/extends/iconSmall';
+
+label {
+  flex: 0 0 5rem;
+  text-align: center;
+  justify-self: stretch;
+  align-self: center;
+}
+.icon {
+  @extend %icon-small;
+}
