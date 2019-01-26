@@ -6,20 +6,12 @@
   height: 0;
   width: 100%;
   display: flex;
-  //align-items: center;
   flex-direction: column;
-
-  label {
-    flex: 0 0 5rem;
-    text-align: center;
-    justify-self: stretch;
-    align-self: center;
-  }
 
   &__searchBox {
     display: flex;
-    height: 0;
-    width: inherit;
+    height: inherit;
+    width: 100%;
     align-items: center;
   }
 
@@ -30,6 +22,7 @@
     align-items: center;
     pointer-events: none;
     border: none;
+    height: 4.7rem;
     transition: border 0.5s;
   }
 
@@ -37,14 +30,11 @@
     border: 1px solid black;
     pointer-events: all;
   }
-  &__icon {
-    @extend %icon-small;
-  }
 
   &__input {
     border: none;
     flex: 1 1 auto;
-    height: 4.5rem;
+    align-self: stretch;
     min-width: 15rem;
     font-size: 1.4rem;
   }
@@ -66,33 +56,32 @@
   position: absolute;
   top: 3.8rem;
   width: 100%;
-  background-color: orange;
+  padding-top: 1rem;
+  background-color: white;
   list-style: none;
+  border-radius: 2px;
 }
-.closeBtn {
-  margin: 0 2rem;
-  border: none;
-  font-size: 2rem;
-}
-/*
+
 @media only screen and (min-width: 50em) {
   .searchBar {
-    padding-right: 0;
+    width: 27.5rem;
+    height: auto;
+    margin-left: 2rem;
 
     &__searchBox {
-      width: 30%;
-      opacity: 1;
+      border: 1px solid black;
+      height: inherit;
+    }
+    &__inputContainer {
       pointer-events: all;
-
-      padding-left: 4rem;
-      transform: translateX(-4.5rem);
+    }
+    &__input:not(:focus),
+    &__input:not(:focus) + button {
+      opacity: 1;
     }
   }
-
   .suggestionContainer {
-    width: 30%;
-    top: 2.25rem;
-    left: 0.8rem;
+    // bc on small screens the searchbar container has no height
+    transform: translateY(1.1rem);
   }
 }
-*/

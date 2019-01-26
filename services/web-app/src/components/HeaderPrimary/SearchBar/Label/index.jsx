@@ -4,7 +4,7 @@ import React from 'react';
 import styles from './style.module.scss';
 
 const Label = () => (
-  <label htmlFor="header_search">
+  <label className={styles.search_label} htmlFor="header_search">
     <svg className={styles.icon}>
       <use xlinkHref="../../../../../public/sprite.svg#icon-search" />
     </svg>

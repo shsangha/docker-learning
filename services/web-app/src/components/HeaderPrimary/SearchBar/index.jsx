@@ -1,7 +1,7 @@
 import React from 'react';
 import { withApollo } from 'react-apollo';
 import { of } from 'rxjs';
-import { switchMap, map, catchError, retry } from 'rxjs/operators';
+import { switchMap, map, catchError, retry, tap } from 'rxjs/operators';
 import propTypes from 'prop-types';
 import gql from 'graphql-tag';
 import styles from './style.module.scss';
@@ -91,6 +91,7 @@ const SearchBar = ({ client }) => {
               <div className={inputBoxClassName}>
                 <input
                   name="header_search"
+                  placeholder="seach is open"
                   id="header_search"
                   type="text"
                   className={styles.searchBar__input}
