@@ -1,0 +1,29 @@
+.overlay {
+  position: fixed;
+  width: 100vw;
+  top: 0;
+  height: 100vh;
+  background-color: rgba($color: #000000, $alpha: 0.65);
+  z-index: 4;
+  transition: opacity 300ms ease-out;
+}
+
+.overlay.exposeHeader {
+  z-index: 2;
+}
+
+.entering {
+  opacity: 0;
+}
+
+.entered {
+  opacity: 1;
+}
+
+.exiting {
+  opacity: 0;
+}
+
+.exited {
+  opacity: 1;
+}
