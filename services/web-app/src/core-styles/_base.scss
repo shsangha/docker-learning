@@ -1,0 +1,37 @@
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  box-sizing: border-box;
+}
+
+//might set initial font here if i decide to change it
+@media only screen and (min-width: 31.25em) {
+  html {
+    font-size: 67.5%;
+  }
+}
+@media only screen and (min-width: 50em) {
+  html {
+    font-size: 70%;
+  }
+}
+@media only screen and (min-width: 62.5em) {
+  html {
+    font-size: 72.5%;
+  }
+}
+@media only screen and (min-width: 75em) {
+  html {
+    font-size: 75%;
+  }
+}

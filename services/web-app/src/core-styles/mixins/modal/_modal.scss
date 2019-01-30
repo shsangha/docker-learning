@@ -1,0 +1,10 @@
+@import '../../extends/modal/baseModal';
+
+@mixin modal($width, $height) {
+  @extend %base-modal;
+  top: 50%;
+  left: 50%;
+  width: $width;
+  height: $height;
+  transform: translate(-50%, -50%);
+}
