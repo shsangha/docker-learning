@@ -1,26 +1,14 @@
 const { gql } = require('apollo-server-express');
 
 module.exports = gql`
-  input AuthInput {
-    email: String!
-    password: String!
-  }
-
-  type success {
+  type AuthResponse {
     token: String!
     refreshToken: String!
   }
 
-  type error {
-    emailErrors: [String]
-    passwordErrors: [String]
-  }
-
-  union AuthResponse = error | success
-
   type Mutation {
-    login(input: AuthInput!): AuthResponse!
-    signUp(input: AuthInput!): AuthResponse!
+    login(email: String!, password: String!): AuthResponse!
+    signUp(email: String!, password: String!): AuthResponse!
     deleteAccount: Boolean!
     changePassword(password: String!): AuthResponse!
     changeEmail(email: String!): AuthResponse!
@@ -28,5 +16,6 @@ module.exports = gql`
 
   type Query {
     authedUser: String!
+    handleError: String
   }
 `;
