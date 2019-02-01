@@ -1,3 +1,7 @@
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-undef */
 const mongoose = require('mongoose');
 const { gql } = require('apollo-server');
 const { createTestClient } = require('apollo-server-testing');
@@ -17,16 +21,10 @@ const server = createServer({
 const { mutate } = createTestClient(server);
 
 const loginInMutation = gql`
-  mutation login($input: AuthInput!) {
-    login(input: $input) {
-      ... on error {
-        emailErrors
-        passwordErrors
-      }
-      ... on success {
-        token
-        refreshToken
-      }
+  mutation login($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
+      token
+      refreshToken
     }
   }
 `;
@@ -51,29 +49,31 @@ describe('testing login functionality', () => {
 
   test('errors out when email doesnt exist', async () => {
     const variables = {
-      input: {
-        email: 'doesntexist@aol.com',
-        password: 'd8d8dlas6%%'
-      }
+      email: 'doesntexist@aol.com',
+      password: 'd8d8dlas6%%'
     };
     const { data, errors } = await mutate({
       mutation: loginInMutation,
       variables
     });
-    expect(data.login.emailErrors).toContain('No user with this email exists');
+    expect(errors[0].message).toEqual('Validation Error');
+    expect(errors[0].extensions.exception.data.messages.email).toEqual(
+      'No user with this email found'
+    );
+    expect(data).toBeNull();
   });
   test('catches incorrect password', async () => {
     const variables = {
-      input: {
-        email: validEmail,
-        password: 'invalidPassword'
-      }
+      email: validEmail,
+      password: 'invalidPassword'
     };
     const { data, errors } = await mutate({
       mutation: loginInMutation,
       variables
     });
-    expect(data.login.passwordErrors).toContain('Incorrect password');
+    expect(errors[0].message).toEqual('Validation Error');
+    expect(errors[0].extensions.exception.data.messages.password).toEqual('Invalid password');
+    expect(data).toBeNull();
   });
   test('displays the correct error when the db connection isnt working', async () => {
     const server = createServer({
@@ -83,25 +83,20 @@ describe('testing login functionality', () => {
     });
     const { mutate } = createTestClient(server);
     const variables = {
-      input: {
-        email: validEmail,
-        password: validPassword
-      }
+      email: validEmail,
+      password: validPassword
     };
     const { data, errors } = await mutate({
       mutation: loginInMutation,
       variables
     });
-    expect(data.login.emailErrors).toContain(
-      'Issue connecting to authentication service try again'
-    );
+    expect(errors[0].message).toEqual('Mongo Error');
+    expect(data).toBeUndefined();
   });
   test('return auth tokens when valid signin is detected', async () => {
     const variables = {
-      input: {
-        email: validEmail,
-        password: validPassword
-      }
+      email: validEmail,
+      password: validPassword
     };
     const { data, errors } = await mutate({
       mutation: loginInMutation,
@@ -109,5 +104,6 @@ describe('testing login functionality', () => {
     });
     expect(data.login.token).toEqual('token');
     expect(data.login.refreshToken).toEqual('refreshToken');
+    expect(errors).toBeUndefined();
   });
 });
