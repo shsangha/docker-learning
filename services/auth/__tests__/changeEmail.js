@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-undef */
 const mongoose = require('mongoose');
 const { gql } = require('apollo-server');
 const { createTestClient } = require('apollo-server-testing');
@@ -7,12 +9,8 @@ const createServer = require('../test-helpers/createServer');
 const changeEmailMutation = gql`
   mutation change($input: String!) {
     changeEmail(email: $input) {
-      ... on error {
-        emailErrors
-      }
-      ... on success {
-        token
-      }
+      token
+      refreshToken
     }
   }
 `;
@@ -55,7 +53,10 @@ describe('testing change email functionality', () => {
       mutation: changeEmailMutation,
       variables: { input: 'invalidemail' }
     });
-    expect(data.changeEmail.emailErrors).toContain('Enter a valid email');
+    //console.log(JSON.stringify(errors, null, 2));
+
+    expect(data).toBeNull();
+    expect(errors[0].extensions.exception.data.messages.email).toEqual('Enter a valid email');
   });
   test('return no errors on a valid email change', async () => {
     const user = await User.create({

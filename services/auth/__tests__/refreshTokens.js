@@ -1,7 +1,11 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-undef */
 const jwt = require('jsonwebtoken');
-const User = require('../src/api/auth/auth.model');
-const { REF_SECRET } = process.env;
 const mongoose = require('mongoose');
+const User = require('../src/api/auth/auth.model');
+
+const { REF_SECRET } = process.env;
 const refreshTokens = require('../src/api/auth/auth.helpers/refreshTokens');
 
 jest.mock('../src/api/auth/auth.helpers/createTokens', () => user => {
@@ -112,12 +116,7 @@ describe('tests for refreshToken function', () => {
     expect(res).toMatchObject({
       token: 'token',
       refreshToken: 'refreshToken',
-      user: {
-        __v: 0,
-        _id: user._id,
-        email: user.email,
-        password: user.password
-      }
+      user: user._id
     });
   });
 });

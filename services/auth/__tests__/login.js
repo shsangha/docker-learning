@@ -91,7 +91,7 @@ describe('testing login functionality', () => {
       variables
     });
     expect(errors[0].message).toEqual('Mongo Error');
-    expect(data).toBeUndefined();
+    expect(data).toBeNull();
   });
   test('return auth tokens when valid signin is detected', async () => {
     const variables = {

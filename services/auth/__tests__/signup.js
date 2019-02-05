@@ -1,3 +1,7 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-shadow */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-undef */
 const mongoose = require('mongoose');
 const { gql } = require('apollo-server');
 const { createTestClient } = require('apollo-server-testing');
@@ -17,16 +21,10 @@ const server = createServer({
 const { mutate } = createTestClient(server);
 
 const signInMutation = gql`
-  mutation signin($input: AuthInput!) {
-    signUp(input: $input) {
-      ... on error {
-        emailErrors
-        passwordErrors
-      }
-      ... on success {
-        token
-        refreshToken
-      }
+  mutation signin($email: String!, $password: String!) {
+    signUp(email: $email, password: $password) {
+      token
+      refreshToken
     }
   }
 `;
@@ -48,57 +46,49 @@ describe('testing sigin functionality', () => {
     await User.remove({ email: validEmail });
   });
 
-  test('it returns tokens if a valid user signs up', async () => {
-    const input = {
-      input: {
-        email: validEmail,
-        password: '3G55sf%ssf'
-      }
+  test('it returns tokens if a valid user signs up with valid credentials', async () => {
+    const variables = {
+      email: validEmail,
+      password: '3G55sf%ssf'
     };
     const { mutate } = createTestClient(server);
-    const { data, errors } = await mutate({ mutation: signInMutation, variables: input });
+    const { data, errors } = await mutate({ mutation: signInMutation, variables });
     expect(data.signUp.token).toEqual('token');
     expect(data.signUp.refreshToken).toEqual('refreshToken');
   });
 
   test('shows the correct errors when given empty input', async () => {
-    const input = {
-      input: {
-        email: '',
-        password: ''
-      }
+    const variables = {
+      email: '',
+      password: ''
     };
-    const { data, errors } = await mutate({ mutation: signInMutation, variables: input });
-    expect(data.signUp.emailErrors).toContain('Email is required');
-    expect(data.signUp.passwordErrors).toContain('Password is required');
+    const { data, errors } = await mutate({ mutation: signInMutation, variables });
+    expect(errors[0].message).toEqual('Validation Error');
+    expect(errors[0].extensions.exception.data.messages.email).toEqual('Email is required');
   });
-  test('graphql validation stops query from running without required input', async () => {
-    const input = {
-      input: {}
-    };
-    const { data, errors } = await mutate({ mutation: signInMutation, variables: input });
+  test('graphql validation for required types works', async () => {
+    const variables = {};
+    const { data, errors } = await mutate({ mutation: signInMutation, variables });
     expect(errors).toHaveLength(2);
     expect(data).toBe(undefined);
   });
   test('doesnt allow for an invalid email', async () => {
-    const input = {
-      input: {
-        email: 'shawn,@.ca',
-        password: '8H6$hdsfd2'
-      }
+    const variables = {
+      email: 'shawn,@.ca',
+      password: '8H6$hdsfd2'
     };
-    const { data, errors } = await mutate({ mutation: signInMutation, variables: input });
-    expect(data.signUp.emailErrors).toContain('Enter a valid email');
+    const { data, errors } = await mutate({ mutation: signInMutation, variables });
+    expect(errors[0].extensions.exception.data.messages.email).toEqual('Enter a valid email');
+    expect(data).toBe(null);
   });
   test('doesnt allow for an invalid password', async () => {
-    const input = {
-      input: {
-        email: 'shawn@.ca',
-        password: '8H62'
-      }
+    const variables = {
+      email: 'shawn@.ca',
+      password: '8H62'
     };
-    const { data, errors } = await mutate({ mutation: signInMutation, variables: input });
-    expect(data.signUp.passwordErrors).toContain('invalid password');
+    const { data, errors } = await mutate({ mutation: signInMutation, variables });
+    expect(errors[0].extensions.exception.data.messages.password).toEqual('invalid password');
+    expect(data).toBeNull();
   });
   test('detects when email is in use', async () => {
     const existingUser = {
@@ -108,13 +98,12 @@ describe('testing sigin functionality', () => {
 
     await User.create(existingUser);
 
-    const input = {
-      input: {
-        email: validEmail,
-        password: validPassword
-      }
+    const variables = {
+      email: validEmail,
+      password: validPassword
     };
-    const { data, errors } = await mutate({ mutation: signInMutation, variables: input });
-    expect(data.signUp.emailErrors).toContain('Email already in use');
+    const { data, errors } = await mutate({ mutation: signInMutation, variables });
+    expect(errors[0].extensions.exception.data.messages.email).toEqual('Email is already in use');
+    expect(errors[0].message).toEqual('Validation Error');
   });
 });

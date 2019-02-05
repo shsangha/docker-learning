@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-undef */
 const mongoose = require('mongoose');
 const { gql } = require('apollo-server');
 const { createTestClient } = require('apollo-server-testing');
@@ -7,13 +10,8 @@ const createServer = require('../test-helpers/createServer');
 const changepwMutation = gql`
   mutation changpw($input: String!) {
     changePassword(password: $input) {
-      ... on error {
-        passwordErrors
-      }
-      ... on success {
-        token
-        refreshToken
-      }
+      token
+      refreshToken
     }
   }
 `;
@@ -21,9 +19,10 @@ const changepwMutation = gql`
 const validEmail = 'shawn@pwchangetest.com';
 const validPassword = '5%%fds9pf8sdf3';
 
-jest.mock('../src/api/auth/auth.helpers/createTokens', () => user => {
-  return { token: 'token', refreshToken: 'refreshToken' };
-});
+jest.mock('../src/api/auth/auth.helpers/createTokens', () => user => ({
+  token: 'token',
+  refreshToken: 'refreshToken'
+}));
 describe('testing change pw functionality', () => {
   beforeAll(async () => {
     await mongoose.connect(global.__MONGO_URI__);
@@ -56,7 +55,8 @@ describe('testing change pw functionality', () => {
       mutation: changepwMutation,
       variables: { input: 'invalidpw' }
     });
-    expect(data.changePassword.passwordErrors).toContain('invalid password');
+    expect(data).toBeNull();
+    expect(errors[0].extensions.exception.data.messages.password).toEqual('invalid password');
   });
   test('return new tokens on a valid password change', async () => {
     const user = await User.create({
