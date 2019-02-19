@@ -12,7 +12,7 @@ module.exports = user => {
     },
     SECRET,
     {
-      expiresIn: '1000'
+      expiresIn: '3m'
     }
   );
 
