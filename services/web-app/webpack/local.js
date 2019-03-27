@@ -1,55 +1,65 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  mode: 'development',
-  entry: './src/index.jsx',
+  mode: "development",
+  entry: "./src/index.jsx",
   output: {
-    filename: 'bundle.[hash].js',
-    publicPath: '/'
+    filename: "bundle.[hash].js",
+    publicPath: "/"
   },
-  devtool: 'inline-source-map',
+  devtool: "inline-source-map",
   module: {
     rules: [
       {
+        test: /\.tsx$/,
+        exclude: /node_modules/,
+        use: "ts-loader"
+      },
+      {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: 'babel-loader'
+        use: "babel-loader"
+      },
+      {
+        test: /\.(graphql|gql)$/,
+        exclude: /node_modules/,
+        loader: "graphql-tag/loader"
       },
       {
         test: /\.scss$/,
         exclude: /\.module\.scss$/,
-        loader: ['style-loader', 'css-loader', 'sass-loader']
+        loader: ["style-loader", "css-loader", "sass-loader"]
       },
       {
         test: /\.module\.scss$/,
         use: [
-          'style-loader',
+          "style-loader",
           {
-            loader: 'css-loader',
+            loader: "css-loader",
             options: {
               modules: true,
               sourceMap: true
             }
           },
-          'sass-loader'
+          "sass-loader"
         ]
       }
     ]
   },
   resolve: {
-    extensions: ['.mjs', '.js', '.jsx']
+    extensions: [".mjs", ".js", ".jsx"]
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, '../public/index.html'),
-      filename: 'index.html'
+      template: path.resolve(__dirname, "../public/index.html"),
+      filename: "index.html"
     }),
     new webpack.HotModuleReplacementPlugin()
   ],
   devServer: {
-    host: 'localhost',
+    host: "localhost",
     port: 3000,
     hot: true
   },
