@@ -1,10 +1,16 @@
 module.exports = {
-  testEnvironment: 'jsdom',
+  roots: ["<rootDir>/src"],
+  testEnvironment: "jsdom",
   moduleNameMapper: {
-    '\\.scss$': 'identity-obj-proxy',
-    '\\.module\\.scss$': 'identity-obj-proxy'
+    "\\.scss$": "identity-obj-proxy",
+    "\\.module\\.scss$": "identity-obj-proxy"
   },
-  setupFiles: ['jest-localstorage-mock'],
-  setupTestFrameworkScriptFile: '<rootDir>enzyme.config.js',
-  collectCoverageFrom: ['**/src/**/*.js(x)']
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
+  setupFiles: ["jest-localstorage-mock"],
+  setupFilesAfterEnv: ["<rootDir>enzyme.config.ts"],
+  transform: {
+    "^.+\\.tsx?$": "ts-jest"
+  },
+  testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+  collectCoverageFrom: ["**/src/**/*.ts(x)"]
 };
