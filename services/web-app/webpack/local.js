@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   mode: "development",
-  entry: "./src/index.jsx",
+  entry: "./src/index.tsx",
   output: {
     filename: "bundle.[hash].js",
     publicPath: "/"
@@ -13,9 +13,9 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx$/,
+        test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
-        use: "ts-loader"
+        use: "awesome-typescript-loader"
       },
       {
         test: /\.(js|jsx)$/,
@@ -49,14 +49,15 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: [".mjs", ".js", ".jsx"]
+    extensions: [".mjs", ".js", ".jsx", ".ts", ".tsx"]
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "../public/index.html"),
       filename: "index.html"
     }),
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/])
   ],
   devServer: {
     host: "localhost",

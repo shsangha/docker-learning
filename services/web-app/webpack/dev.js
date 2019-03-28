@@ -1,55 +1,61 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  mode: 'development',
-  entry: './src/index.jsx',
+  mode: "development",
+  entry: "./src/index.tsx",
   output: {
-    filename: 'bundle.[hash].js',
-    publicPath: '/'
+    filename: "bundle.[hash].js",
+    publicPath: "/"
   },
-  devtool: 'inline-source-map',
+  devtool: "inline-source-map",
   module: {
     rules: [
       {
+        test: /\.(ts|tsx)$/,
+        exclude: /node_modules/,
+        use: "awesome-typescript-loader"
+      },
+      {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: 'babel-loader'
+        use: "babel-loader"
       },
       {
         test: /\.scss$/,
         exclude: /\.module\.scss$/,
-        loader: ['style-loader', 'css-loader', 'sass-loader']
+        loader: ["style-loader", "css-loader", "sass-loader"]
       },
       {
         test: /\.module\.scss$/,
         use: [
-          'style-loader',
+          "style-loader",
           {
-            loader: 'css-loader',
+            loader: "css-loader",
             options: {
               modules: true,
               sourceMap: true
             }
           },
-          'sass-loader'
+          "sass-loader"
         ]
       }
     ]
   },
   resolve: {
-    extensions: ['.mjs', '.js', '.jsx']
+    extensions: [".mjs", ".js", ".jsx", ".ts", ".tsx"]
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, '../public/index.html'),
-      filename: 'index.html'
+      template: path.resolve(__dirname, "../public/index.html"),
+      filename: "index.html"
     }),
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/])
   ],
   devServer: {
-    host: '0.0.0.0',
+    host: "0.0.0.0",
     port: 3000,
     hot: true
   },
