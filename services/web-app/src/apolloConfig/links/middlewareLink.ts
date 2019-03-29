@@ -1,8 +1,7 @@
-/* eslint-disable no-undef */
 import { setContext } from "apollo-link-context";
 
 // prettier-ignore
-const middlewareLink = setContext((_, { headers }) => ({
+const middlewareLink = setContext((_, { headers }: {headers:object}) => ({
       headers: {
         ...headers,
         "x-token": localStorage.getItem('token') || '',
