@@ -4,7 +4,8 @@
  *  @param {[function]} fns - a list of functions that we want to run one after another
  *  @return - a function that accepts an event and args and runs each function with the event/args
  */
-export default function(...fns: Array<(e: any, ...args: any[]) => any>) {
+
+export default function(...fns: any[]) {
   return (e: any, ...args: any[]) => {
     fns.some(fn => {
       if (fn && typeof fn === "function") {
