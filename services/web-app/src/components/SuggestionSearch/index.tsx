@@ -6,7 +6,7 @@
  */
 
 import React, { Component } from "react";
-import { fromEvent, Observable, Subscription } from "rxjs";
+import { fromEvent, Observable, Subscription, Observer } from "rxjs";
 import { pluck, map, distinctUntilChanged, catchError } from "rxjs/operators";
 import { throttle } from "lodash";
 import combineEventHandlers from "./utils/combineEventHandlers";
@@ -18,7 +18,7 @@ export default class SuggestionSearch extends Component<Props, State> {
   public static defaultProps = {
     defaultSuggestions: [],
     highlightOnStart: -1,
-    initialInputValues: "",
+    initialInputValue: "",
     openOnStart: false,
     streamTransform: (input$: Observable<string>) => input$,
     stateReducer: (
@@ -56,18 +56,32 @@ export default class SuggestionSearch extends Component<Props, State> {
     };
   }
 
-  protected initialzeSuggestionStream(
-    input: HTMLElement
-  ): Observable<string[]> {
-    return this.props
+  public triggerSuggestion$: (value: string) => void = () => {
+    return;
+  };
+
+  /*  public createOnChange$ = (): Observable<any> =>
+    Observable.create((observer: Observer<any>) => {
+      this.triggerFieldChange$ = (name: string, value: any) => {
+        observer.next({ name, value });
+      };
+    }).pipe(
+      startWith({ name: "any string" }),
+      pairwise(),
+      share()
+    );
+
+
+*/
+
+  protected initialzeSuggestionStream = (): Observable<any> =>
+    this.props
       .streamTransform(
-        fromEvent(input, "input").pipe(
-          pluck<Event, string>("target", "value"),
-          map(searchTerm => {
-            return searchTerm.trim();
-          }),
-          distinctUntilChanged()
-        )
+        Observable.create((observer: Observer<any>) => {
+          this.triggerSuggestion$ = (value: string) => {
+            observer.next(value);
+          };
+        }).pipe(distinctUntilChanged())
       )
       .pipe(
         catchError((error: Error) => {
@@ -75,9 +89,9 @@ export default class SuggestionSearch extends Component<Props, State> {
           return this.state.suggestions;
         })
       );
-  }
 
   public componentDidMount() {
+    /*
     if (this.inputRef.current) {
       this.subscription = this.initialzeSuggestionStream(
         this.inputRef.current
@@ -93,6 +107,8 @@ export default class SuggestionSearch extends Component<Props, State> {
         }
       );
     }
+    */
+    this.forceUpdate();
   }
 
   public componentWillUnmount() {
@@ -215,13 +231,13 @@ export default class SuggestionSearch extends Component<Props, State> {
   };
 
   public inputHandleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.internalSetState(
+    this.setState(
       {
         inputValue: event.target.value,
         highlightedIndex: -1,
         open: true
-      },
-      changeTypes.inputChange
+      }
+      //  changeTypes.inputChange
     );
   };
 
@@ -236,6 +252,12 @@ export default class SuggestionSearch extends Component<Props, State> {
       },
       changeTypes.inputFocus
     );
+  };
+
+  public focusInput = () => {
+    if (this.inputRef.current) {
+      this.inputRef.current.focus();
+    }
   };
 
   public handleItemHover = (index: number) => {
@@ -280,15 +302,14 @@ export default class SuggestionSearch extends Component<Props, State> {
     onClick?: (event: React.MouseEvent<HTMLElement>) => void;
   } = {}) => {
     const { inputValue } = this.state;
-
     return {
       ref: this.inputRef,
       value: inputValue,
-      onChange: combineEventHandlers(onChange, this.inputHandleChange),
-      onKeyDown: combineEventHandlers(onKeyDown, this.keyDownHandler),
+      onChange: this.inputHandleChange,
+      //     onKeyDown: combineEventHandlers(onKeyDown, this.keyDownHandler),
       onBlur: combineEventHandlers(onBlur, this.inputHandleBlur),
       onClick: combineEventHandlers(onClick, this.inputHandleFocus),
-      onFocus: combineEventHandlers(onFocus, this.inputHandleFocus),
+      //    onFocus: combineEventHandlers(onFocus, this.inputHandleFocus),
       ...rest
     };
   };
@@ -327,6 +348,7 @@ export default class SuggestionSearch extends Component<Props, State> {
       // might be useful to expose to the children
       openMenu: this.openMenu,
       closeMenu: this.closeMenu,
+      focusInput: this.focusInput,
 
       // refs
       menuRef: this.menuRef,
