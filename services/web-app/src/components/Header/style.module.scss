@@ -1,0 +1,20 @@
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1.5rem 3rem;
+  align-items: center;
+}
+
+.logo {
+  order: -1;
+  margin-right: auto;
+
+  &SVG {
+    width: 10.5rem;
+    height: 3.5rem;
+  }
+}
+
+.links {
+  font-size: 20px;
+}
