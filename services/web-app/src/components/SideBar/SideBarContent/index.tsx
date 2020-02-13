@@ -5,7 +5,12 @@ import { TransitionStatus } from "react-transition-group/Transition";
 interface Props {
   closeSideBar: () => void;
   transitionStatus: TransitionStatus;
-  children: ({  }: {}) => React.ReactNode;
+  children: ({
+
+  }: {
+    transitionStatus: TransitionStatus;
+    closeSideBar: () => void;
+  }) => React.ReactNode;
 }
 
 const SidebarContent: React.FunctionComponent<Props> = props => {

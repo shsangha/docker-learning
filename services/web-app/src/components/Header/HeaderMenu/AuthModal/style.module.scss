@@ -1,0 +1,44 @@
+@import "../../../../core-styles/mixins/modal/_modal";
+@import "../../../../core-styles/extends/overlay/overlay";
+
+.signupBtn {
+  border: none;
+  background-color: inherit;
+  text-emphasis: bold;
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: 1.1rem;
+}
+
+.modal {
+  @include modal(90%, 60%);
+  background-color: #fff;
+  transition: opacity 400ms ease-out;
+
+  &.entering {
+    opacity: 0;
+  }
+
+  &.entered {
+    opacity: 1;
+  }
+  &.exiting {
+    opacity: 0;
+  }
+}
+
+.overlay {
+  @extend %overlay;
+  transition: opacity 400ms ease-out;
+
+  &.entering {
+    opacity: 0;
+  }
+
+  &.entered {
+    opacity: 1;
+  }
+  &.exiting {
+    opacity: 0;
+  }
+}

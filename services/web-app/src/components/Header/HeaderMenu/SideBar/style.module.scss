@@ -1,0 +1,80 @@
+@import "../../../../core-styles/extends/overlay/overlay";
+@import "../../../../core-styles/mixins/sidebar/sidebar";
+.sideBar {
+  @include sidebar(left);
+  transition: all 300ms ease;
+}
+
+.sideBar.entering {
+  transform: translateX(-100%);
+}
+
+.sideBar.entered {
+  transform: translateX(0);
+}
+
+.sideBar.exiting {
+  transform: translateX(-100%);
+}
+
+.overlay {
+  @extend %overlay;
+  transition: opacity 300ms ease-out;
+}
+
+.overlay.entering {
+  opacity: 0;
+}
+
+.overlay.entered {
+  opacity: 1;
+}
+
+.overlay.exiting {
+  opacity: 0;
+}
+
+.overlay.exited {
+  opacity: 1;
+}
+
+.burger {
+  width: 3rem;
+  height: 2rem;
+}
+
+.toggleButton {
+  border: none;
+  background-color: transparent;
+
+  & line {
+    stroke: #000;
+    stroke-width: 3;
+  }
+}
+
+.burger {
+  transition: all 0.5s;
+  margin: 0;
+
+  & line {
+    transition: all 0.5s;
+  }
+}
+
+.burger.open {
+  & :nth-child(1) {
+    transform: rotate(45deg);
+    transform-origin: top left;
+  }
+
+  & :nth-child(2) {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  & :nth-child(3) {
+    transform: rotate(-45deg);
+    transform-origin: bottom left;
+  }
+}

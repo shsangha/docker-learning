@@ -12,7 +12,7 @@ test('calls internalSetState properly', () => {
   instance.closeMenu({});
   expect(internalSetStateSpy).toHaveBeenCalledTimes(1);
   expect(internalSetStateSpy).toHaveBeenCalledWith(
-    { open: false, inputValue: '' },
+    { highlightedIndex: -1, inputValue: '', open: false },
     changeTypes.menuClose
   );
   internalSetStateSpy.mockRestore();

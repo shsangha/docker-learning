@@ -1,5 +1,3 @@
-@import '../../../core-styles/extends/iconSmall';
-
 .searchBar {
   position: absolute;
   left: 0;
@@ -7,6 +5,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  z-index: 1;
 
   &__searchBox {
     display: flex;

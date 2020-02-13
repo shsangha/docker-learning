@@ -1,7 +1,7 @@
 import React from 'react';
 import { withApollo } from 'react-apollo';
 import { of } from 'rxjs';
-import { switchMap, map, catchError, retry, tap } from 'rxjs/operators';
+import { switchMap, map, catchError, retry, throttleTime } from 'rxjs/operators';
 import propTypes from 'prop-types';
 import gql from 'graphql-tag';
 import styles from './style.module.scss';
@@ -19,6 +19,7 @@ const defaultSuggestions = ['one', 'two', 'three', 'four', 'five'];
 
 const SearchBar = ({ client }) => {
   const renderMenuController = (open, closeMenu) => {
+    console.log('KJDLKFDLKDKLFJ');
     return open ? <CloseButton closeMenu={closeMenu} /> : <Label />;
   };
   const renderSubmitButton = inputValue => {
@@ -45,6 +46,7 @@ const SearchBar = ({ client }) => {
   const streamTransform = $input => {
     const { query } = client;
     return $input.pipe(
+      throttleTime(300),
       switchMap(input =>
         query({
           query: suggestionQuery,

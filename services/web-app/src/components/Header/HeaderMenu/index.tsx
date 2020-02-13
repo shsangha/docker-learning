@@ -26,8 +26,8 @@ const MyGrails = () => (
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
-      width="28"
-      height="28"
+      width="35"
+      height="35"
       viewBox="0 0 28 28"
       role="img"
     >
@@ -39,9 +39,9 @@ const MyGrails = () => (
 
 const CommonMenuItems = () => (
   <>
-    <div>shop</div>
-    <div>sell</div>
-    <div>read</div>
+    <Link to="/shop">shop</Link>
+    <Link to="/sell">sell</Link>
+    <Link to="/read">read</Link>
   </>
 );
 
@@ -49,7 +49,7 @@ const HeaderMenu = ({ authenticated, windowWidth }: Props) => (
   <div className={styles.headerMenu}>
     {(() => {
       if (windowWidth < 1000) {
-        return !authenticated ? (
+        return authenticated ? (
           <>
             <MyGrails />
             <SideBar />
@@ -61,11 +61,16 @@ const HeaderMenu = ({ authenticated, windowWidth }: Props) => (
           </>
         );
       }
-      return authenticated ? (
+      return !authenticated ? (
         <>
           <CommonMenuItems />
           <MyGrails />
-          <div>MENU</div>
+          <div className={styles.dropDown}>
+            <span>mouse over me</span>
+            <div className={styles.dropDownContent}>
+              <p>test link info</p>
+            </div>
+          </div>
         </>
       ) : (
         <>

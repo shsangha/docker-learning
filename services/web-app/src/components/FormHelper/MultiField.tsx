@@ -1,5 +1,5 @@
 import React from "react";
-import { FieldProps, FormHelperState } from "./types";
+import { FieldProps } from "./types";
 import FormFieldHOC from "./FormFieldHOC";
 import set from "./utils/set";
 import retrieveInternalValue from "./utils/retrieveInternalValue";
@@ -19,28 +19,33 @@ const MultiField: React.FunctionComponent<FieldProps> = props => {
     errorFn?: (touched: object) => object,
     touchedFn?: (error: object) => object
   ) => {
-    props.setFormState(prevState => ({
-      ...prevState,
-      values: setInternalValue(
-        prevState.values,
-        props.name,
-        valueFn(retrieveInternalValue(prevState.values, props.name))
-      ),
-      errors: errorFn
-        ? setInternalError(
-            prevState.errors,
-            props.name,
-            errorFn(retrieveInternalValue(prevState.errors, props.name))
-          )
-        : prevState.errors,
-      touched: touchedFn
-        ? setInternalTouched(
-            prevState.touched,
-            props.name,
-            touchedFn(retrieveInternalValue(prevState.touched, props.name))
-          )
-        : prevState.touched
-    }));
+    props.setFormState(
+      prevState => ({
+        ...prevState,
+        values: setInternalValue(
+          prevState.values,
+          props.name,
+          valueFn(retrieveInternalValue(prevState.values, props.name))
+        ),
+        errors: errorFn
+          ? setInternalError(
+              prevState.errors,
+              props.name,
+              errorFn(retrieveInternalValue(prevState.errors, props.name))
+            )
+          : prevState.errors,
+        touched: touchedFn
+          ? setInternalTouched(
+              prevState.touched,
+              props.name,
+              touchedFn(retrieveInternalValue(prevState.touched, props.name))
+            )
+          : prevState.touched
+      }),
+      () => {
+        props.triggerFormValidation$();
+      }
+    );
   };
 
   const swap = (index1: number, index2: number) => {

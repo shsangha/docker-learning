@@ -2,8 +2,7 @@
 /* eslint-disable no-undef */
 import React from 'react';
 import { mount } from 'enzyme';
-import { throwError, pipe } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take, tap } from 'rxjs/operators';
 
 import SuggestionSearch from '../../../SuggestionSearch';
 
@@ -28,12 +27,15 @@ describe('tests that the subscription subcribes/unsubcscibes when it is meant to
     expect(unMountSpy).toHaveBeenCalledTimes(1);
     expect(instance.subscription.closed).toBeTruthy();
   });
+
+  // need to think of a better way of doing this
   test('actually responds to input change', () => {
     const checkStreamTransformCalled = $input => {
       return $input.pipe(
         map(input => {
           expect(input).toEqual('Test');
-        })
+        }),
+        take(1)
       );
     };
     const wrapper = mount(

@@ -5,7 +5,6 @@ const { SECRET } = process.env;
 
 module.exports = async (req, res, next) => {
   const token = req.headers['x-token'];
-
   if (token) {
     try {
       const { user } = await jwt.verify(token, SECRET);
@@ -28,9 +27,11 @@ module.exports = async (req, res, next) => {
           res.set('x-token', data.token);
           res.set('x-refresh-token', data.refreshToken);
           req.user = data.user;
+        } else {
+          res.status(401);
         }
       } catch (error) {
-        console.log(error);
+        res.status(401);
       }
     }
   }

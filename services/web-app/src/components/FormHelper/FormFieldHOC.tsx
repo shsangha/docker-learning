@@ -1,66 +1,89 @@
 import React from "react";
-import propTypes from "prop-types";
-import { toPath } from "lodash";
+import { FormFieldHOCProps, FieldProps, FormHelperState } from "./types";
 import { FormContext } from "./index";
-import pipe from "./utils/pipe";
-import isEmptyObj from "./utils/isEmptyObj";
-import set from "./utils/set";
-import runAll from "./utils/runAll";
 import retrieveInternalValue from "./utils/retrieveInternalValue";
 
-const { setInternalError } = set;
+export default (
+  Component: React.ComponentType<FieldProps>,
+  multiField: boolean
+) =>
+  class FormFieldHoc extends React.Component<FormFieldHOCProps> {
+    public static contextType = FormContext;
 
-export default (Component, multiField) =>
-  class FormFieldHoc extends React.Component {
-    static contextType = FormContext;
-
-    static propTypes = {
-      validateOnChange: propTypes.bool,
-      validateOnBlur: propTypes.bool,
-      validator: propTypes.func,
-      name: propTypes.string.isRequired
-    };
-
-    static defaultProps = {
+    public context!: React.ContextType<typeof FormContext>;
+    public static defaultProps = {
       validateOnChange: true,
       validateOnBlur: true
     };
 
-    pipeMultiFieldValidation = (validator, name) => {
-      return pipe(
-        validator,
-        err => (isEmptyObj(err) ? null : err),
-        filterdError =>
-          filterdError
-            ? setInternalError(
-                retrieveInternalValue(this.context.errors, name) || {},
-                toPath(name).slice(-1),
-                filterdError
-              )
-            : {}
-      );
-    };
+    public componentDidMount() {
+      const { name, validator } = this.props;
 
-    componentDidMount() {
-      const { name, validateOnChange, validateOnBlur, validator } = this.props;
+      const args: [
+        string,
+        boolean,
+        ((state: Partial<FormHelperState>) => object)?
+      ] = [name, multiField];
+
       if (validator) {
-        this.context.attachFieldValidator(
-          name,
-          multiField
-            ? this.pipeMultiFieldValidation(validator, name)
-            : validator
-        );
+        args.push(validator);
+      }
+      this.context.attachField(...args);
+    }
+
+    public componentDidUpdate(prevProps: FormFieldHOCProps) {
+      const { name, validator } = this.props;
+      // nned to pipe here too if the validator is a root
+      if (prevProps.name !== name || prevProps.validator !== validator) {
+        const args: [
+          string,
+          boolean,
+          ((state: Partial<FormHelperState>) => object)?
+        ] = [name, multiField];
+
+        if (validator) {
+          args.push(validator);
+        }
+        this.context.attachField(...args);
       }
     }
 
-    componentWillUnmount() {
+    public componentWillUnmount() {
       const { name } = this.props;
-      const { detachFieldValidator, cleanUpField } = this.context;
-      cleanUpField(name);
-      detachFieldValidator(name);
+      const { detachField, removeField } = this.context;
+      removeField(name);
+      detachField(name);
     }
 
-    public inputHandlers = ({
+    public handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value, type, checked } = event.currentTarget;
+
+      let newValue: string | boolean = value;
+
+      if (type && type === "checkbox") {
+        newValue = checked;
+      }
+
+      this.context.setFieldValue(name, newValue, () => {
+        if (this.props.validateOnChange) {
+          this.context.triggerFieldChange$(name, newValue);
+        }
+      });
+    };
+
+    public handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+      if (this.props.validateOnBlur) {
+        this.context.triggerFieldBlur$(
+          this.props.name,
+          this.context.retrieveInternalValue(
+            this.context.values,
+            this.props.name
+          )
+        );
+      }
+    };
+
+    public field = ({
       onChange,
       onBlur,
       ...rest
@@ -68,17 +91,18 @@ export default (Component, multiField) =>
       onChange?: (event: React.ChangeEvent<HTMLElement>) => void;
       onBlur?: (event: React.FocusEvent<HTMLElement>) => void;
     } = {}) => {
-      const {
-        handleChange,
-        triggerFieldChange$,
-        triggerFieldBlur$
-      } = this.context;
+      const { values } = this.context;
 
-      const changeHandler = onChange || handleChange;
+      const { name } = this.props;
+
+      const value = retrieveInternalValue(values, name);
 
       return {
-        onChange: runAll(changeHandler, triggerFieldChange$),
-        onBlur: runAll(onBlur, triggerFieldBlur$)
+        onChange: onChange || this.handleChange,
+        onBlur: onBlur || this.handleBlur,
+        value,
+        name,
+        ...rest
       };
     };
 
@@ -93,11 +117,17 @@ export default (Component, multiField) =>
       };
     };
 
-    render() {
+    public render() {
       const FieldState = this.getFieldState();
+      const field = this.field;
 
       return (
-        <Component {...this.props} {...this.context} FieldState={FieldState} />
+        <Component
+          {...this.props}
+          {...this.context}
+          field={field}
+          FieldState={FieldState}
+        />
       );
     }
   };

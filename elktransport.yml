@@ -1,0 +1,48 @@
+version: '3.1'
+
+services:
+  pipeline:
+    build: ./ubuntu
+    container_name: pipeline
+  
+   
+    networks:
+      - backend
+    depends_on:
+      - mongo
+      - kibana
+
+  mongo:
+    image: mongo:4.0-xenial
+    restart: always
+    command: mongod --replSet "rs0"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: grailed
+      MONGO_ADVERTISED_HOSTNAME: mongo
+    networks: 
+      - backend
+    volumes: 
+      - test-db-data:/data/db
+      - ./mongo/scripts:/docker-entrypoint-initdb.d/
+
+  elasticsearch:
+      image: elasticsearch:5.6
+      networks:
+        - backend
+
+  kibana:
+    image: kibana:5.6
+    ports:
+       - 5601:5601
+    depends_on:
+       - elasticsearch 
+    networks: 
+       - backend
+
+networks:
+  backend:
+
+volumes:
+  test-db-data:

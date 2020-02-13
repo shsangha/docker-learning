@@ -1,10 +1,5 @@
-/* eslint-disable no-param-reassign */
-
-/* eslint-disable no-multi-assign */
-import { toPath } from 'lodash';
-import targetInnerVal from './targetInnerVal';
-
-//const isValidIndex = num => Number(num) % 1 === 0 && Number(num) >= 0;
+import { toPath } from "lodash";
+import targetInnerVal from "./targetInnerVal";
 
 /* @input - {Array} - a 2d array containing an array of field names and the corresponding error object
    @ouput - {Object} a combined error object from all the fields
@@ -15,20 +10,27 @@ import targetInnerVal from './targetInnerVal';
    it's fine becasue we contain the side-effect within the function so we aren't mutating any values
    that exist outide the scope of this function so it is still visibiy pure. 
 
-
-  ***DECIDED TO NOT USE THIS AND FLATTEN ERROR STATE BC IT MADE MORE SENSE JUST LEAVING THIS HERE AS DEMONSTRATION
-
 */
 
-export default (validatorKeys, errors) =>
-  errors.reduce((combinedErrors, currentError, idx) => {
-    if (currentError) {
+export default (validatorKeys: string[], errors: Array<object | null>): any =>
+  errors.reduce((combinedErrors, currentError, idx): object => {
+    if (currentError && combinedErrors) {
       const name = validatorKeys[idx];
       const pathArray = toPath(name);
-
+      //    console.log(currentError, "CURRENT ERROR");
       const { target, index } = targetInnerVal(combinedErrors, pathArray);
 
-      target[pathArray[index]] = currentError;
+      if (target[pathArray[index]]) {
+        target[pathArray[index]] = {
+          ...target[pathArray[index]],
+          ...currentError
+        };
+      } else {
+        target[pathArray[index]] = currentError;
+      }
     }
-    return combinedErrors;
+    if (combinedErrors) {
+      return combinedErrors;
+    }
+    return {};
   }, {});

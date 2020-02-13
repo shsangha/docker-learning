@@ -1,4 +1,5 @@
 import combineFieldValidationResults from "../../utils/combineFieldValidationResults";
+import { stringify } from "querystring";
 
 describe("tests that validation results get combined as expected", () => {
   test("ignores errors that are null", () => {
@@ -9,7 +10,7 @@ describe("tests that validation results get combined as expected", () => {
     expect(result).toMatchObject({});
   });
 
-  test("overrides other errors when root error is last validated", () => {
+  test("doenst override other errors when root error is last validated", () => {
     const keys = ["one[1]", "one[2]", "one"];
     const errors = [
       { some: "error" },
@@ -21,6 +22,12 @@ describe("tests that validation results get combined as expected", () => {
 
     expect(result).toMatchObject({
       one: {
+        "1": {
+          some: "error"
+        },
+        "2": {
+          some: "error"
+        },
         one: {
           some: "error"
         }

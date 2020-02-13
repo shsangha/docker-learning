@@ -1,7 +1,33 @@
 import { Observable } from "rxjs";
 
 export interface Props {
-  children: (stateAndHelpers: object) => React.ReactNode;
+  children: ({
+
+  }: {
+    getInputProps: ({
+
+    }?: {
+      onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+      onBlur?: (event: React.FocusEvent<HTMLElement>) => void;
+      onChange?: (event: React.ChangeEvent<HTMLElement>) => void;
+      onFocus?: (event: React.FocusEvent<HTMLElement>) => void;
+      onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+    }) => object;
+    getListItemProps: ({
+
+    }: {
+      index?: number;
+      onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+      onMouseMove?: (event: React.MouseEvent<HTMLElement>) => void;
+      onMouseDown?: (event: React.MouseEvent<HTMLElement>) => void;
+    }) => object;
+    openMenu: () => void;
+    focusInput: () => void;
+    closeMenu: () => void;
+    menuRef: React.RefObject<HTMLElement>;
+    itemRef: React.RefObject<HTMLElement>;
+    inputRef: React.RefObject<HTMLInputElement>;
+  }) => React.ReactNode;
   defaultSuggestions: string[];
   highlightOnStart: number;
   initialInputValue: string;

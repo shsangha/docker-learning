@@ -12,6 +12,7 @@ module.exports = gql`
     deleteAccount: Boolean!
     changePassword(password: String!): AuthResponse!
     changeEmail(email: String!): AuthResponse!
+    fake(name: String!): Boolean!
   }
 
   type Query {

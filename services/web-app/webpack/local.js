@@ -6,7 +6,7 @@ module.exports = {
   mode: "development",
   entry: "./src/index.tsx",
   output: {
-    filename: "bundle.[hash].js",
+    filename: "bundle.[name].js",
     publicPath: "/"
   },
   devtool: "inline-source-map",
@@ -60,7 +60,7 @@ module.exports = {
     new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/])
   ],
   devServer: {
-    host: "localhost",
+    host: "0.0.0.0",
     port: 3000,
     hot: true
   },

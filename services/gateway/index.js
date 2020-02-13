@@ -14,9 +14,7 @@ const remoteEndpoints = ['http://auth-service:3030/graphql'];
     const schemas = await Promise.all(remoteEndpoints.map(ep => getIntrospectedSchema(ep)));
     const server = new ApolloServer({
       schema: mergeSchemas({ schemas }),
-      context: ({ req }) => {
-        return req.user ? { user: req.user } : {};
-      }
+      context: ({ req }) => (req.user ? { user: req.user } : {})
     });
     app.use(
       cors({

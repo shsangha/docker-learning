@@ -1,0 +1,14 @@
+[
+  {
+    "repeat(100,100)": {
+      "posted": "{{date(new Date(2014, 0, 1), new Date()).getTime()}}",
+      "market": "{{random(\"grailed\", \"core\", \"sartorial\", \"hype\")}}",
+      "category": "{{random(\"tops\",\"bottoms\",\"acessories\",\"shoes\" )}}",
+      "likes": "{{integer(0, 999)}}",
+      "title": "{{lorem(1,\"sentences\")}}",
+      "designer": "{{random(\"A\",\"B\",\"C\",\"D\")}}",
+      "sold": "{{bool()}}",
+      "size": "{{random(\"Small\",\"Medium\",\"Large\")}}"
+    }
+  }
+]

@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../auth.model');
 
 const { SECRET, REF_SECRET } = process.env;
-console.log(SECRET, 'what were getttubg frin tge v');
 module.exports = user => {
   const { _id, email, password } = user;
   const refreshSecret = password + REF_SECRET;

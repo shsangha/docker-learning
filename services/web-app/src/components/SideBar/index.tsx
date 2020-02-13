@@ -1,33 +1,40 @@
 import React, { Component } from "react";
 import SideBarContent from "./SideBarContent";
-import { CSSTransition } from "react-transition-group";
+import { Transition } from "react-transition-group";
+import { TransitionStatus } from "react-transition-group/Transition";
 
-const contextDefaults: {
+interface SideBarContext {
   open: boolean;
-  openSideBar: () => void;
   closeSideBar: () => void;
-} = {
-  open: false,
-  openSideBar: () => {
-    return null;
-  },
-  closeSideBar: () => {
-    return null;
-  }
-};
+  toggleSideBar: () => void;
+  openSideBar: () => void;
+}
 
-const SideBarContext = React.createContext(contextDefaults);
+const SideBarContext = React.createContext({} as SideBarContext);
 
 interface ContentProps {
   enterTimeout?: number;
   exitTimeout?: number;
-  children: ({  }: {}) => React.ReactNode;
+  children: ({
+
+  }: {
+    transitionStatus: TransitionStatus;
+    closeSideBar: () => void;
+  }) => React.ReactNode;
+}
+
+interface ToggleTriggerProps {
+  children: ({
+
+  }: {
+    toggleSideBar: () => void;
+    open: boolean;
+  }) => React.ReactNode;
 }
 
 interface OpenTriggerProps {
   children: ({  }: { openSideBar: () => void }) => React.ReactNode;
 }
-
 interface CloseTriggerProps {
   children: ({  }: { closeSideBar: () => void }) => React.ReactNode;
 }
@@ -37,6 +44,11 @@ export default class SideBar extends Component<{}, { open: boolean }> {
     open: false
   };
 
+  public toggleSideBar = () => {
+    this.setState(prevState => ({
+      open: !prevState.open
+    }));
+  };
   public openSideBar = () => {
     this.setState({
       open: true
@@ -52,14 +64,24 @@ export default class SideBar extends Component<{}, { open: boolean }> {
       <SideBarContext.Provider
         value={{
           open: this.state.open,
-          openSideBar: this.openSideBar,
-          closeSideBar: this.closeSideBar
+          closeSideBar: this.closeSideBar,
+          toggleSideBar: this.toggleSideBar,
+          openSideBar: this.openSideBar
         }}
       >
         {this.props.children}
       </SideBarContext.Provider>
     );
   }
+
+  public static ToggleTrigger: React.FunctionComponent<ToggleTriggerProps> = ({
+    children
+  }) => (
+    <SideBarContext.Consumer>
+      {({ toggleSideBar, open }) => children({ toggleSideBar, open })}
+    </SideBarContext.Consumer>
+  );
+
   public static OpenTrigger: React.FunctionComponent<OpenTriggerProps> = ({
     children
   }) => (
@@ -67,6 +89,7 @@ export default class SideBar extends Component<{}, { open: boolean }> {
       {({ open, openSideBar }) => (open ? null : children({ openSideBar }))}
     </SideBarContext.Consumer>
   );
+
   public static CloseTrigger: React.FunctionComponent<CloseTriggerProps> = ({
     children
   }) => (
@@ -78,12 +101,11 @@ export default class SideBar extends Component<{}, { open: boolean }> {
   public static Content: React.FunctionComponent<ContentProps> = props => (
     <SideBarContext.Consumer>
       {({ open, closeSideBar }) => (
-        <CSSTransition
+        <Transition
           timeout={{
             enter: props.enterTimeout || 300,
             exit: props.exitTimeout || 300
           }}
-          classNames="sidebar"
           unmountOnExit={true}
           in={open}
         >
@@ -94,7 +116,7 @@ export default class SideBar extends Component<{}, { open: boolean }> {
               closeSideBar={closeSideBar}
             />
           )}
-        </CSSTransition>
+        </Transition>
       )}
     </SideBarContext.Consumer>
   );

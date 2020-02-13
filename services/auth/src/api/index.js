@@ -7,3 +7,4 @@ module.exports = {
   typeDefs,
   userModel
 };
+ 

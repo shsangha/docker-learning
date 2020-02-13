@@ -8,7 +8,7 @@
 export default function(...fns: any[]) {
   return (e: any, ...args: any[]) => {
     fns.some(fn => {
-      if (fn && typeof fn === "function") {
+      if (fn) {
         // @ts-ignore needed to do this because of a bug with spread args https://github.com/Microsoft/TypeScript/issues/4130
         fn(e, ...args);
       }

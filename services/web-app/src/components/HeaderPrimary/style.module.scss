@@ -2,9 +2,12 @@
 
 .globalHeader {
   min-height: 7.6rem;
+  min-width: 20rem;
   position: fixed;
   top: 0;
   width: 100%;
+  z-index: 3;
+  background-color: #fff;
 }
 
 .wrapper {
@@ -14,7 +17,5 @@
   align-items: center;
   position: relative;
   height: 7.6rem;
-  padding: 1.7rem 2rem;
   border-bottom: 1px solid #000;
-  z-index: 0;
 }

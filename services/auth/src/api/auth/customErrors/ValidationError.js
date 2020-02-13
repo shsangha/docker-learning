@@ -1,6 +1,6 @@
 const { createError } = require('apollo-errors');
 
-const ValidationError = createError('FooError', {
+const ValidationError = createError('ValidationError', {
   message: 'Validation Error'
 });
 

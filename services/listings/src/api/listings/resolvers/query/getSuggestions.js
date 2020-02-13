@@ -36,6 +36,8 @@ const getSuggestions = async (_, { input, size, sold }, { esClient }, info) => {
       formatQuery('name')
     ]
   });
+
+  return ['results', 'from ', 'server'];
 };
 
 module.exports = getSuggestions;

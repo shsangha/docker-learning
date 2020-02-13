@@ -12,9 +12,9 @@ interface Data {
   authenticated: boolean;
 }
 
-class AuthQuery extends Query<Data, {}> {}
+class AuthQuery extends Query<Data> {}
 
-export default (Component: React.ReactType) => (props: Props) => (
+export default (Component: React.ElementType) => (props: Props) => (
   <AuthQuery query={authStatusQuery}>
     {({ data }) =>
       data &&

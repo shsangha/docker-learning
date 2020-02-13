@@ -60,20 +60,6 @@ export default class SuggestionSearch extends Component<Props, State> {
     return;
   };
 
-  /*  public createOnChange$ = (): Observable<any> =>
-    Observable.create((observer: Observer<any>) => {
-      this.triggerFieldChange$ = (name: string, value: any) => {
-        observer.next({ name, value });
-      };
-    }).pipe(
-      startWith({ name: "any string" }),
-      pairwise(),
-      share()
-    );
-
-
-*/
-
   protected initialzeSuggestionStream = (): Observable<any> =>
     this.props
       .streamTransform(
@@ -91,11 +77,8 @@ export default class SuggestionSearch extends Component<Props, State> {
       );
 
   public componentDidMount() {
-    /*
     if (this.inputRef.current) {
-      this.subscription = this.initialzeSuggestionStream(
-        this.inputRef.current
-      ).subscribe(
+      this.subscription = this.initialzeSuggestionStream().subscribe(
         (suggestions: string[]) => {
           this.setState({ suggestions });
         },
@@ -107,7 +90,7 @@ export default class SuggestionSearch extends Component<Props, State> {
         }
       );
     }
-    */
+
     this.forceUpdate();
   }
 
@@ -231,13 +214,14 @@ export default class SuggestionSearch extends Component<Props, State> {
   };
 
   public inputHandleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState(
+    this.triggerSuggestion$(event.target.value);
+    this.internalSetState(
       {
         inputValue: event.target.value,
         highlightedIndex: -1,
         open: true
-      }
-      //  changeTypes.inputChange
+      },
+      changeTypes.inputChange
     );
   };
 
@@ -306,10 +290,10 @@ export default class SuggestionSearch extends Component<Props, State> {
       ref: this.inputRef,
       value: inputValue,
       onChange: this.inputHandleChange,
-      //     onKeyDown: combineEventHandlers(onKeyDown, this.keyDownHandler),
+      onKeyDown: combineEventHandlers(onKeyDown, this.keyDownHandler),
       onBlur: combineEventHandlers(onBlur, this.inputHandleBlur),
       onClick: combineEventHandlers(onClick, this.inputHandleFocus),
-      //    onFocus: combineEventHandlers(onFocus, this.inputHandleFocus),
+      onFocus: combineEventHandlers(onFocus, this.inputHandleFocus),
       ...rest
     };
   };

@@ -1,27 +1,25 @@
 import React, { Component } from "react";
 import ModalContent from "./ModalContent";
-import { CSSTransition } from "react-transition-group";
+import { Transition } from "react-transition-group";
+import { TransitionStatus } from "react-transition-group/Transition";
 
-const contextDefaults: {
+interface Context {
   open: boolean;
   openModal: () => void;
   closeModal: () => void;
-} = {
-  open: false,
-  openModal: () => {
-    return null;
-  },
-  closeModal: () => {
-    return null;
-  }
-};
+}
 
-const ModalContext = React.createContext(contextDefaults);
+const ModalContext = React.createContext({} as Context);
 
 interface ContentProps {
   enterTimeout?: number;
   exitTimeout?: number;
-  children: ({  }: {}) => React.ReactNode;
+  children: ({
+
+  }: {
+    transitionStatus: TransitionStatus;
+    closeModal: () => void;
+  }) => React.ReactNode;
 }
 
 interface TriggerProps {
@@ -57,15 +55,16 @@ export default class Modal extends Component<{}, { open: boolean }> {
     );
   }
 
-  public static Content: React.FunctionComponent<ContentProps> = props => (
+  public static Content: React.FunctionComponent<ContentProps> = (
+    props: ContentProps
+  ) => (
     <ModalContext.Consumer>
       {({ open, closeModal }) => (
-        <CSSTransition
+        <Transition
           timeout={{
             enter: props.enterTimeout || 400,
             exit: props.exitTimeout || 400
           }}
-          classNames="modal"
           unmountOnExit={true}
           in={open}
         >
@@ -76,7 +75,7 @@ export default class Modal extends Component<{}, { open: boolean }> {
               closeModal={closeModal}
             />
           )}
-        </CSSTransition>
+        </Transition>
       )}
     </ModalContext.Consumer>
   );

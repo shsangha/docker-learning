@@ -1,20 +1,22 @@
 import React from 'react';
+import propTypes from 'prop-types';
 import styles from './style.module.scss';
-import { SearchContextConsumer } from '../SearchContext';
+import FullMenu from './FullMenu';
+import BurgerMenu from './BurgerMenu';
+import ScreenWidthHOC from '../../ScreenWidthHOC';
 
-export default () => (
-  <SearchContextConsumer>
-    {({ state: { open } }) => {
-      const className = open ? `${styles.menu} ${styles.open}` : `${styles.menu}`;
-      return (
-        <div className={className}>
-          <a href="">item</a>
-          <a href="">item</a>
-          <a href="">item</a>
-          <a href="">item</a>
-          <a href="">item</a>
-        </div>
-      );
-    }}
-  </SearchContextConsumer>
-);
+const HeaderMenu = ({ windowWidth }) => {
+  const Menu = windowWidth < 1000 ? BurgerMenu : FullMenu;
+
+  return (
+    <div className={styles.headerMenu}>
+      <Menu />
+    </div>
+  );
+};
+
+HeaderMenu.propTypes = {
+  windowWidth: propTypes.number.isRequired
+};
+
+export default ScreenWidthHOC(HeaderMenu);

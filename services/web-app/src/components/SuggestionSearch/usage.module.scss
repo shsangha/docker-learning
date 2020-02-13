@@ -1,0 +1,44 @@
+.wrapper {
+  display: inline-block;
+  position: relative;
+  background-color: white;
+  width: 30%;
+}
+
+.item {
+  font-size: 2rem;
+  height: 20px;
+  border: 1px solid green;
+}
+
+.item__selected {
+  font-size: 2rem;
+  height: 20px;
+  border: 1px solid orange;
+  background-color: yellow;
+}
+
+.input {
+  width: 100%;
+  margin-bottom: 3px;
+}
+
+.menu {
+  width: 100%;
+  overflow: scroll;
+  display: flex;
+  flex-direction: column;
+  height: 90px;
+  position: relative;
+}
+
+input .input {
+}
+
+:focus {
+  background-color: navajowhite;
+}
+
+.tdd {
+  border: 1px solid black;
+}

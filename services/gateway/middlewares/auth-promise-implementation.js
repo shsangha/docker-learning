@@ -1,4 +1,4 @@
-//implementation of the auth middleware with promises just to demostrate it can be done this way
+// implementation of the auth middleware with promises just to demostrate it can be done this way
 const jwt = require('jsonwebtoken');
 const fetch = require('node-fetch');
 

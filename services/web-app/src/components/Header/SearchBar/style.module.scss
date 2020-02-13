@@ -3,4 +3,35 @@
   order: 1;
   flex-basis: 100%;
   background-color: #fff;
+  border: 1px solid black;
+}
+
+.searchForm {
+  width: inherit;
+  display: flex;
+  padding: 0.5rem 0.5rem;
+}
+
+.suggestions {
+  background-color: black;
+}
+
+.input {
+  flex-basis: 65%;
+  border: none;
+}
+
+.glass {
+  flex: 32px 0 0;
+  border-color: greenyellow;
+  stroke-width: 1;
+}
+
+svg {
+  margin-right: 1rem;
+}
+
+.button {
+  flex: 20% 1 1;
+  background-color: inherit;
 }

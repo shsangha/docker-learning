@@ -27,9 +27,9 @@ export class SearchContextProvider extends Component {
     return (
       <SearchContext.Provider
         value={{
-          state: this.state,
-          notifySearchClosed: this.searchClosed,
-          notifySearchOpened: this.searchOpen
+          open: this.state.open,
+          closeSearch: this.searchClosed,
+          openSearch: this.searchOpen
         }}
       >
         {this.props.children}

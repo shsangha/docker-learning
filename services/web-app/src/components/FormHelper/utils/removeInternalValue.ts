@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-multi-assign */
 import { toPath, cloneDeep } from "lodash";
 import { IndexSignatureObject } from "../types";
 export default (rootObject: object, fieldName: string) => {

@@ -5,7 +5,12 @@ import { TransitionStatus } from "react-transition-group/Transition";
 interface Props {
   transitionStatus: TransitionStatus;
   closeModal: () => void;
-  children: ({  }: {}) => React.ReactNode;
+  children: ({
+
+  }: {
+    transitionStatus: TransitionStatus;
+    closeModal: () => void;
+  }) => React.ReactNode;
 }
 
 const ModalContent: React.FunctionComponent<Props> = props => {

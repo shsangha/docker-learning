@@ -1,0 +1,4 @@
+@import '../../../../../core-styles/extends/icons/iconSmall';
+.icon {
+  @extend %icon-small;
+}

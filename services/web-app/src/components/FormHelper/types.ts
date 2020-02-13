@@ -16,17 +16,14 @@ export interface FormHelperState {
 
 export interface FormHelperContext {
   addField: (name: string, value: any) => void;
-  attachFieldValidator: (
+  attachField: (
     name: string,
-    validator: (state: Partial<FormHelperState>) => void,
-    multiField: boolean
+    multiField: boolean,
+    validator?: (state: Partial<FormHelperState>) => object
   ) => void;
-  detachFieldValidator: (name: string) => void;
+  detachField: (name: string) => void;
   removeField: (name: string) => void;
-  setFormState: (name: string) => (stateChange: StateChange) => void;
   setTouched: (val: boolean, ...names: any[]) => void;
-  validateForm: () => void;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: () => void;
   values: object;
   touched: object;
@@ -34,15 +31,19 @@ export interface FormHelperContext {
   isValidating: boolean;
   isSubmitting: boolean;
   resetForm: () => void;
-  triggerFieldChange$: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  triggerFieldBlur$: (event: React.FocusEvent<HTMLInputElement>) => void;
+  triggerFieldChange$: (name: string, value: any) => void;
+  triggerFieldBlur$: (name: string, value: any) => void;
+  retrieveInternalValue: (object: object, name: string) => any;
   triggerSubmission$: () => void;
+  triggerFormValidation$: () => void;
+  setFieldValue: (field: string, value: any, callback?: () => void) => void;
+  setFormState: (stateChange: StateChange, callback?: () => void) => void;
 }
 
 export interface FormHelperProps {
   initialValues: object;
   onSubmit: (input: null | Partial<FormHelperState>) => void;
-  children: (input: object) => React.ReactNode;
+  children: (input: FormHelperContext) => React.ReactNode;
   rootValidators: {
     [key: string]: (state: Partial<FormHelperState>) => object;
   };
@@ -65,7 +66,6 @@ export interface FormFieldHOCProps {
     value: any;
     errors: object;
     touched: boolean;
-    setFormState: (stateChange: StateChange) => void;
   }) => React.ReactElement;
 }
 
@@ -90,7 +90,6 @@ export interface FieldProps {
     touched: boolean;
   };
   field: Field;
-  setFormState: (stateChange: StateChange) => void;
   children: ({
 
   }: {
@@ -98,15 +97,33 @@ export interface FieldProps {
     value: any;
     errors: object;
     touched: boolean;
-    setFormState: (stateChange: StateChange) => void;
+    [key: string]: any;
   }) => React.ReactElement;
+  addField: (name: string, value: any) => void;
+  attachField: (
+    name: string,
+    multiField: boolean,
+    validator?: (state: Partial<FormHelperState>) => object
+  ) => void;
+  detachField: (name: string) => void;
+  removeField: (name: string) => void;
+  setTouched: (val: boolean, ...names: any[]) => void;
+  handleSubmit: () => void;
+  values: object;
+  touched: object;
+  name: string;
+  errors: object;
+  isValidating: boolean;
+  isSubmitting: boolean;
+  resetForm: () => void;
+  triggerFieldChange$: (name: string, value: any) => void;
+  triggerFieldBlur$: (name: string, value: any) => void;
+  retrieveInternalValue: (object: object, name: string) => any;
+  triggerSubmission$: () => void;
+  triggerFormValidation$: () => void;
+  setFieldValue: (field: string, value: any, callback?: () => void) => void;
+  setFormState: (stateChange: StateChange, callback?: () => void) => void;
 }
-/*
- onChange: ChangeHandler;
-    onBlur: (event: React.FocusEvent<...>) => void;
-    value: any;
-    name: string;
-*/
 
 export interface WithDataProps<T> {
   data: T;

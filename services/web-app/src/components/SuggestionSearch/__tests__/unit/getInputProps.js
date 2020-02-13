@@ -16,6 +16,7 @@ test('tests that input props are set as expected', () => {
       onKeyDown: expect.any(Function),
       onBlur: expect.any(Function),
       onClick: expect.any(Function),
+      onFocus: expect.any(Function),
       extra: expect.any(String)
     })
   );

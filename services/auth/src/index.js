@@ -5,7 +5,7 @@ const { typeDefs, resolvers, userModel } = require('./api');
 const router = require('./routes');
 const refreshTokens = require('./api/auth/auth.helpers/refreshTokens');
 
-require('./db/db-connect')('mongodb://auth-db:27017/auth?authSource=admin', {
+require('./db-connect')('mongodb://auth-db:27017/auth?authSource=admin', {
   user: 'root',
   pass: 'root',
   useNewUrlParser: true

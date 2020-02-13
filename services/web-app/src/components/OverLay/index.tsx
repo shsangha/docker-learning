@@ -1,12 +1,27 @@
-import React from "react";
+import React, { Component } from "react";
 
 interface Props {
-  onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
-  classNames: string;
+  close: () => void;
+  className: string;
 }
 
-const Overlay: React.SFC<Props> = ({ onClick, classNames }) => (
-  <div role="presentation" onClick={onClick} className={classNames} />
-);
+export default class Overlay extends Component<Props, {}> {
+  componentDidMount() {
+    window.addEventListener("keydown", this.closeWithEsc);
+  }
 
-export default Overlay;
+  componentWillUnmount() {
+    window.removeEventListener("keydown", this.closeWithEsc);
+  }
+
+  public closeWithEsc = (event: KeyboardEvent) => {
+    if (event.keyCode === 27) {
+      this.props.close();
+    }
+  };
+
+  render() {
+    const { close, className } = this.props;
+    return <div role="presentation" onClick={close} className={className} />;
+  }
+}

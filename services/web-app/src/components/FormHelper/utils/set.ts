@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-multi-assign */
 import { toPath, cloneDeep } from "lodash";
 import targetInnerVal from "./targetInnerVal";
 import { IndexSignatureObject } from "../types";
@@ -26,15 +24,15 @@ const shallowSetState = (
    return what we want the new state to look like. 
 */
 const set = (
-  createFieldFunc: (nextPath: string | number) => object | any[]
-) => (rootObject: IndexSignatureObject, fieldNames:, values) => {
-  if (rootObject[fieldNames] !== undefined) {
-    return shallowSetState(rootObject, fieldNames, values);
+  createFieldFunc: (nextPath: string | number | undefined) => object | any[]
+) => (rootObject: IndexSignatureObject, fieldName: string, value: any) => {
+  if (rootObject[fieldName] !== undefined) {
+    return shallowSetState(rootObject, fieldName, value);
   }
   // need to do this so we don't actually mutate the state object
   const rootRefference = cloneDeep(rootObject);
 
-  const pathArray = toPath(fieldNames);
+  const pathArray = toPath(fieldName);
 
   // targets the nested value we want to set the state on
   const { target, index } = targetInnerVal(
@@ -43,7 +41,7 @@ const set = (
     createFieldFunc
   );
 
-  target[pathArray[index]] = values;
+  target[pathArray[index]] = value;
 
   return rootRefference;
 };
@@ -51,8 +49,8 @@ const set = (
 const setInternalValue = set(nextPath =>
   Number(nextPath) % 1 === 0 && Number(nextPath) >= 0 ? [] : {}
 );
-const setInternalError = set(nextPath => ({}));
-const setInternalTouched = set(nextPath => ({}));
+const setInternalError = set(() => ({}));
+const setInternalTouched = set(() => ({}));
 
 export default {
   setInternalValue,

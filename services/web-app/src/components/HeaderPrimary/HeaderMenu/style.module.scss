@@ -1,12 +1,7 @@
-.menu {
+.headerMenu {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
   position: absolute;
   right: 0;
-  z-index: 0;
-}
-
-.open {
-  display: none;
+  margin-right: 2rem;
 }

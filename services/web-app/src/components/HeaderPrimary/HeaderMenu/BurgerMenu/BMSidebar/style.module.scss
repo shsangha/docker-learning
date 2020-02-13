@@ -1,0 +1,40 @@
+@import "../../../../../core-styles/mixins/sidebar/sidebar";
+@import "../../../../../core-styles/extends/overlay/overlay";
+
+.content {
+  @include sidebar(left);
+  transition: all 300ms ease;
+}
+
+.content.entering {
+  transform: translateX(-100%);
+}
+
+.content.entered {
+  transform: translateX(0);
+}
+
+.content.exiting {
+  transform: translateX(-100%);
+}
+
+.overlay {
+  @extend %overlay;
+  transition: opacity 300ms ease-out;
+}
+
+.overlay.entering {
+  opacity: 0;
+}
+
+.overlay.entered {
+  opacity: 1;
+}
+
+.overlay.exiting {
+  opacity: 0;
+}
+
+.overlay.exited {
+  opacity: 1;
+}

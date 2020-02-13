@@ -1,0 +1,19 @@
+version: '3.1'
+services:
+ 
+  web-app-test:
+    build: .
+    image: web-app-test
+    command: npm run dev
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/usr/src/app
+      - web-app-test-node-modules:/usr/src/app/node_modules
+    networks:
+      - frontend
+volumes: 
+  web-app-test-node-modules:
+
+networks:
+   frontend:

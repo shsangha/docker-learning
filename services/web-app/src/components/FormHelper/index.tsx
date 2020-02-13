@@ -7,13 +7,13 @@ import {
   IndexSignatureObject,
   StateChange
 } from "./types";
-import { merge as deepmerge } from "lodash";
+import { merge as deepmerge, toPath } from "lodash";
 import { Observable, merge, of, zip, Observer, Subscription } from "rxjs";
 import {
   filter,
   switchMap,
   mergeMap,
-  throttleTime,
+  debounceTime,
   tap,
   pairwise,
   startWith,
@@ -42,22 +42,22 @@ export default class FormHelper extends Component<
     rootValidators: {}
   };
 
-  private fieldValidators: IndexSignatureObject = {};
-  private triggerFieldChange$: (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => void = () => {
+  public fields: IndexSignatureObject = {};
+  public triggerFieldChange$: (name: string, value: any) => void = () => {
     return;
   };
-  private triggerFieldBlur$: (
-    event: React.FocusEvent<HTMLInputElement>
-  ) => void = () => {
+  public triggerFieldBlur$: (name: string, value: any) => void = () => {
     return;
   };
-  private triggerSubmission$: () => void = () => {
+  public triggerFormValidation$: () => void = () => {
     return;
   };
-  private validationSubscription?: Subscription;
-  private submissionSubscription?: Subscription;
+  public triggerSubmission$: () => void = () => {
+    return;
+  };
+  public validationSubscription?: Subscription;
+  public submissionSubscription?: Subscription;
+  public formValidationSubscription?: Subscription;
 
   constructor(props: FormHelperProps) {
     super(props);
@@ -73,33 +73,32 @@ export default class FormHelper extends Component<
     };
   }
 
-  private createOnChange$ = (): Observable<any> =>
+  public createOnChange$ = (): Observable<any> =>
     Observable.create((observer: Observer<any>) => {
-      this.triggerFieldChange$ = (
-        event: React.ChangeEvent<HTMLInputElement>
-      ) => {
-        const { name, value } = event.target;
-        if (name && value) {
-          observer.next({ name, value });
-        }
+      this.triggerFieldChange$ = (name: string, value: any) => {
+        observer.next({ name, value });
       };
     }).pipe(
-      startWith({ name: null }),
+      startWith({ name: "any string" }),
       pairwise(),
       share()
     );
 
-  private createOnBlur$ = (): Observable<any> =>
+  public createOnBlur$ = (): Observable<any> =>
     Observable.create((observer: Observer<any>) => {
-      this.triggerFieldBlur$ = (event: React.FocusEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
-        if (name && value) {
-          observer.next({ name, value });
-        }
+      this.triggerFieldBlur$ = (name: string, value: any) => {
+        observer.next({ name, value });
       };
     }).pipe(share());
 
-  private createOnSubmit$ = (): Observable<any> =>
+  public createFormValidation$ = (): Observable<any> =>
+    Observable.create((observer: Observer<any>) => {
+      this.triggerFormValidation$ = () => {
+        observer.next("");
+      };
+    }).pipe(share());
+
+  public createOnSubmit$ = (): Observable<any> =>
     Observable.create((observer: Observer<any>) => {
       this.triggerSubmission$ = () => {
         observer.next("");
@@ -118,7 +117,8 @@ export default class FormHelper extends Component<
             { name: string; value: object }
           ]) => prev.name === current.name
         ),
-        throttleTime(300),
+
+        debounceTime(300),
         switchMap(([_, { name, value }]) =>
           zip(this.runFieldLevelValidation(name, value), of(name)).pipe(
             takeUntil(onBlur$)
@@ -135,12 +135,20 @@ export default class FormHelper extends Component<
         mergeMap(([_, { name, value }]) =>
           zip(this.runFieldLevelValidation(name, value), of(name)).pipe(
             takeUntil(onBlur$)
-          )
+          
         )
       )
     ).pipe(
-      map(([error, name]) => setInternalError(this.state.errors, name, error))
-    );
+      map(([error, name]) =>
+        setInternalError(
+          this.state.errors,
+          this.fields[name].multiField
+            ? `${name}.${toPath(name).slice(-1)[0]}`
+            : name,
+          error
+        )
+      )
+    ));
 
   public manageOnBlur$ = (
     onBlur$: Observable<any>,
@@ -148,7 +156,7 @@ export default class FormHelper extends Component<
   ) =>
     onBlur$.pipe(
       tap(({ name }: { name: string; value: object }) => {
-        if (retrieveInternalValue(this.state.touched, name)) {
+        if (!retrieveInternalValue(this.state.touched, name)) {
           this.setTouched(true, name);
         }
       }),
@@ -159,82 +167,113 @@ export default class FormHelper extends Component<
         ).pipe(takeUntil(onSubmit$))
       ),
       map(([[fieldError, name], rootErrors]) => {
+        const fieldName = this.fields[name].multiField
+          ? `${name}.${toPath(name).slice(-1)[0]}`
+          : name;
         if (fieldError) {
           return deepmerge(
-            setInternalError(this.state.errors, name, fieldError),
+            setInternalError(this.state.errors, fieldName, fieldError),
             rootErrors
           );
         } else {
           return deepmerge(
-            removeInternalValue(this.state.errors, name),
+            removeInternalValue(this.state.errors, fieldName),
             rootErrors
           );
         }
       })
     );
 
-  public manageOnSubmit$ = (onSubmit$: Observable<any>) =>
-    onSubmit$.pipe(
+  public manageFormValidation$ = (input$: Observable<any>) =>
+    input$.pipe(
       tap(() => this.setState({ isValidating: true })),
-      tap(() => this.setTouched(true, Object.keys(this.fieldValidators))),
-      switchMap(() =>
-        zip([this.runAllFieldLevelValidations(), this.runFormLevelValidation()])
+      tap(() =>
+        this.setTouched(
+          true,
+          Object.keys(this.fields).filter(name => this.fields[name].validator)
+        )
       ),
-      map(([fieldErrors, formErrors]) => deepmerge(fieldErrors, formErrors)),
-      tap(errors =>
-        this.setState({
-          isValidating: false,
-          errors
-        })
-      )
+      switchMap(() =>
+        zip(this.runAllFieldLevelValidations(), this.runFormLevelValidation())
+      ),
+      map(([fieldErrors, formErrors]) => deepmerge(fieldErrors, formErrors))
     );
 
   public componentDidMount() {
     const changeValidation$ = this.createOnChange$();
     const blurValidation$ = this.createOnBlur$();
     const submitValidation$ = this.createOnSubmit$();
+    const formValidation$ = this.createFormValidation$();
 
     this.validationSubscription = merge(
       this.manageOnChange$(changeValidation$, blurValidation$),
-      this.manageOnBlur$(blurValidation$, submitValidation$)
+      this.manageOnBlur$(
+        blurValidation$,
+        merge(submitValidation$, formValidation$)
+      )
     ).subscribe(validationResults => {
       this.setState({ errors: validationResults });
     });
 
-    this.submissionSubscription = this.manageOnSubmit$(
+    this.submissionSubscription = this.manageFormValidation$(
       submitValidation$
     ).subscribe(errors => {
-      if (isEmptyObj(errors)) {
-        this.props.onSubmit(this.state.values);
-      } else {
-        this.setState({ errors });
-      }
+      this.setState(
+        {
+          isValidating: false,
+          errors
+        },
+        () => {
+          if (isEmptyObj(errors)) {
+            this.props.onSubmit(this.state.values);
+          }
+        }
+      );
     });
+
+    this.formValidationSubscription = this.manageFormValidation$(
+      formValidation$
+    ).subscribe(errors => {
+      this.setState({ errors });
+    });
+
+    this.forceUpdate();
   }
-  public componentWillUnmount() {}
+  public componentWillUnmount() {
+    if (this.submissionSubscription) {
+      this.submissionSubscription.unsubscribe();
+    }
+    if (this.validationSubscription) {
+      this.validationSubscription.unsubscribe();
+    }
+    if (this.formValidationSubscription) {
+      this.formValidationSubscription.unsubscribe();
+    }
+  }
 
-  public attachFieldValidator = (
+  public attachField = (
     name: string,
-    validator: (state: Partial<FormHelperState>) => void,
-    multiField: boolean
+    multiField: boolean,
+    validator?: (state: Partial<FormHelperState>) => object
   ) => {
-    this.fieldValidators[name] = {
-      validator,
-      multiField
-    };
+    if (validator) {
+      this.fields[name] = {
+        multiField,
+        validator
+      };
+    } else {
+      this.fields[name] = {
+        multiField
+      };
+    }
   };
 
-  public detachFieldValidator = (name: string) => {
-    delete this.fieldValidators[name];
+  public detachField = (name: string) => {
+    delete this.fields[name];
   };
 
-  public runFieldLevelValidation = (
-    name: string,
-    value: Partial<FormHelperState>
-  ) => {
-    return new Promise(resolve =>
-      resolve(this.fieldValidators[name].validator(value))
-    )
+  public runFieldLevelValidation = (name: string, value: any) => {
+    return new Promise(resolve => resolve(this.fields[name].validator(value)))
       .then(result => (isEmptyObj(result) ? null : result))
       .catch(error => ({
         [ValidationErrorKey]: error.message || "Error with validation try again"
@@ -242,23 +281,30 @@ export default class FormHelper extends Component<
   };
 
   public runAllFieldLevelValidations = () => {
-    const validatorKeys = Object.keys(this.fieldValidators);
+    const validatorKeys = Object.keys(this.fields);
 
-    const promiseArray = validatorKeys.map(name => {
-      return this.runFieldLevelValidation(
-        name,
-        retrieveInternalValue(this.state.values, name)
-      );
-    });
-
-    return Promise.all(promiseArray).then(errors =>
-      combineFieldValidationResults(validatorKeys, errors)
-    );
+    return Promise.all(
+      validatorKeys.reduce((result: Array<Promise<any>>, name) => {
+        if (this.fields[name].validator) {
+          result.push(
+            this.runFieldLevelValidation(
+              name,
+              retrieveInternalValue(this.state.values, name)
+            ).then(validationResult =>
+              this.fields[name] && this.fields[name].multiField
+                ? { [`${toPath(name).slice(-1)[0]}`]: validationResult }
+                : validationResult
+            )
+          );
+        }
+        return result;
+      }, [])
+    ).then(errors => combineFieldValidationResults(validatorKeys, errors));
   };
 
   public runFormLevelValidation = () => {
     const { rootValidators } = this.props;
-    const { values, errors } = this.state;
+    const { values } = this.state;
 
     const keysArray = Object.keys(rootValidators);
 
@@ -266,31 +312,18 @@ export default class FormHelper extends Component<
       keysArray.map(key =>
         new Promise(res => res(rootValidators[key](values)))
           .then(result => (isEmptyObj(result) ? null : result))
-          .then(result =>
-            this.fieldValidators[key].multiField ? { [key]: result } : result
-          )
           .catch(error => ({
             [ValidationErrorKey]: error.message || "Validation failed try again"
           }))
+          .then(validationResult => {
+            return this.fields[key] && this.fields[key].multiField
+              ? { [`${toPath(key).slice(-1)[0]}`]: validationResult }
+              : validationResult;
+          })
       )
-    ).then(errorsArray =>
-      combineFieldValidationResults(keysArray, errorsArray)
-    );
-  };
-
-  public handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = event.currentTarget;
-
-    let newValue: string | boolean = value;
-
-    if (type && type === "checkbox") {
-      newValue = checked;
-    }
-
-    this.setState(prevState => ({
-      ...prevState,
-      values: setInternalValue(prevState.values, name, newValue)
-    }));
+    ).then(errorsArray => {
+      return combineFieldValidationResults(keysArray, errorsArray);
+    });
   };
 
   public handleSubmit = () => {
@@ -332,63 +365,74 @@ export default class FormHelper extends Component<
     }));
   };
 
-  public validateForm = () => {
-    if (this.triggerSubmission$) {
-      this.triggerSubmission$();
+  public setFormState = (
+    stateChange: StateChange,
+    callback: () => void = () => {
+      return;
     }
+  ): void => {
+    this.setState(stateChange, callback);
   };
 
-  public setFormState = (name: string) => (stateChange: StateChange) => {
-    const changes: object =
-      typeof stateChange === "function"
-        ? stateChange(retrieveInternalValue(this.state.values, name))
-        : stateChange;
-
-    this.setState(prevState => ({
-      values: setInternalValue(prevState.values, name, changes)
-    }));
+  public setFieldValue = (
+    field: string,
+    value: any,
+    callback?: (input?: any) => void
+  ) => {
+    this.setState(
+      prevState => ({
+        ...prevState,
+        values: setInternalValue(prevState.values, field, value)
+      }),
+      () => {
+        if (callback) {
+          callback();
+        }
+      }
+    );
   };
 
   public getStateAndHelpers = () => {
     const {
       addField,
-      attachFieldValidator,
-      detachFieldValidator,
+      attachField,
+      detachField,
       removeField,
-      setFormState,
       setTouched,
-      validateForm,
-      handleChange,
       handleSubmit,
       state,
       resetForm,
       triggerFieldChange$,
       triggerFieldBlur$,
-      triggerSubmission$
+      triggerSubmission$,
+      triggerFormValidation$,
+      setFieldValue,
+      setFormState
     } = this;
 
     return {
       addField,
-      attachFieldValidator,
-      detachFieldValidator,
+      attachField,
+      detachField,
       removeField,
-      setFormState,
       setTouched,
-      validateForm,
-      handleChange,
       handleSubmit,
       ...state,
       resetForm,
       triggerFieldChange$,
       triggerFieldBlur$,
-      triggerSubmission$
+      triggerSubmission$,
+      triggerFormValidation$,
+      retrieveInternalValue,
+      setFieldValue,
+      setFormState
     };
   };
   public render() {
     const { children } = this.props;
     return (
       <FormContext.Provider value={{ ...this.getStateAndHelpers() }}>
-        {children(this.getStateAndHelpers())}
+        {children({ ...this.getStateAndHelpers() })}
       </FormContext.Provider>
     );
   }
